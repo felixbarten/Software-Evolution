@@ -21,3 +21,4 @@ public value calcClassLoc(loc location){
 	 for(c <-classes(model)) n += calcLoc(c);
 	 return n;
 }
+
