@@ -78,5 +78,6 @@ public class CommandLine {
             }
             System.out.println();
         }
+		/* single line multiline with code */ System.out.println("Hello again"); // counts as 1 loc
     }
 }

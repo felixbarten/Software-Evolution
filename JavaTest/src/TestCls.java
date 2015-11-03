@@ -6,11 +6,11 @@ import java.util.*;;
  */
 public class TestCls {
 	public String testStr = "test";
-	// single line comment testtt
+
 	public void testMethod() {
-		int i = 10; 
-		System.out.println("println tst");
-		int j = 10; 
+	int i = 10; 
+	System.out.println("println tst");
+	int j = 10; 
 		switch (i) {
 			case(2): {
 				System.out.println("i = 0");
@@ -32,21 +32,27 @@ public class TestCls {
 				
 			}
 		}
-		if ("rascal is stupid" == ""){
+		if ("rascal" == ""){
 			System.out.println("2");
 		}
 	}
 	// some more comments
+
+	/**
+	 * JAVADOC
+	 */
 	public void testSwitch() {
 		int i = 423534;
-		switch (i) {
-		case(0): 
-			break;
-		case(1):{ 
-			break;
-		}
-		default: 
-			break;
+		
+		switch (i) {		
+			case(0): {
+				break;
+			}
+			case(1):{ 
+				break;
+			}
+			default: 
+				break;
 		}
 	}
 }
