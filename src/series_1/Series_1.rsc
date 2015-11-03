@@ -4,7 +4,7 @@ import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import Prelude;
-
+import Set;
 
 public void createAST() {
 	int LOC = 0;
@@ -114,7 +114,6 @@ public void createAST() {
 }
 
 public void getLOCs(bool debug) {
-	//|project://smallsql0.21_src|
 	list[loc] projects = [ |project://RascalTestProject|, |project://JavaTest2|];
 	for (project <- projects) {
 		getLOC(project, debug);
@@ -178,20 +177,15 @@ public void getLOC(loc project, bool debug) {
 		}
 		
 	}
-	println("Results for project: <project>");
-	println("Lines of Code: <LOC>");
-	println("Blank lines: <blank>");
-	println("Commented lines: <comment>");
 }
 
-public void getLOCFromFile(loc file, bool debug) {
-
+public tuple[int,int,int] getLOCFromFile(loc file, bool debug) {
 	//myModel = createM3FromEclipseFile(file);	
 	//projectAST = create(file, true);
 
 	int LOC = 0;
-	int blank = 0;
-	int comment = 0;
+	int blankLines = 0;
+	int comments = 0;
 	bool incomment = false; 
 	
 	srcLines = readFileLines(file); 	
@@ -199,31 +193,42 @@ public void getLOCFromFile(loc file, bool debug) {
 		if (/^\s*\/\/\s*\w*/ := line) {
 			if (debug)
 				println("single line comment: <line>");
-			comment += 1;
-		} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
-			if (debug)
-				println("single line multiline");
-			comment += 1;
-		}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
-			if (debug)
-				println("single line multiline with code");
+			comments += 1;
+		} else if (/((\s*\/\*[\w\s]+\*\/)+[\s\w]+(\/\/[\s\w]+$)*)+/ := line) {
+			if (debug) {
+				println("multiline and code intertwined: <line>");
+			}
 			LOC += 1;
-		}else if (/^\s*\/\*\s*/ := line){
-			incomment = true;
-			comment += 1;
+			
+		}else if (/^\s*\/\*\*?[\w\s\?\@]*\*\/$/ := line) {
 			if (debug)
-				println("start multiline comment");
+				println("single line multiline:  <line>");
+			comments += 1;
+		}  else if (/\s*\/\*[\w\s]*\*\/[\s\w]+/ := line) {
+			if (debug)
+				println("multiline with code: <line>");
+			LOC += 1;
+		}	else if (/^[\s\w]*\*\/\s*\w+[\s\w]*/ := line) {
+			// end of multiline + code == loc
+			if (debug) {
+				println("end of multiline + code:  <line>");
+			}
+			incomment = false; 
+			LOC += 1;
+		}	else if (/^\s*\/\*\*?[\s\w\=\.\,\?]*$/ := line){
+			incomment = true;
+			comments += 1;
+			if (debug)
+				println("start multiline comment:  <line>");
 				
 		} else if (/\s*\*\/\s*$/ := line){
 			if (debug)
-				println("end multiline comment");
-			comment += 1;
+				println("end multiline comment: <line>");
+			comments += 1;
 			incomment = false;
 				
 		} else if (/^\s*$/ := line) {
-			blank += 1;
-			if (debug)
-				println("Blank: <line>");
+			blankLines += 1;
 		} else {
 			if (!incomment) {
 				if (debug)
@@ -232,36 +237,141 @@ public void getLOCFromFile(loc file, bool debug) {
 			} else {
 				if (debug)
 					println("comment: <line>");
-				comment += 1;
+				comments += 1;
 				}
 			}
 			
 		}
-		
 	println("Results for file: <file>");
 	println("Lines of Code: <LOC>");
-	println("Blank lines: <blank>");
-	println("Commented lines: <comment>");
+	println("Commented lines: <comments>");
+	println("Blank lines: <blankLines>");
+	return <LOC,blankLines,comments>;
+}
+
+public tuple[int,int,int] getLOCFile(loc file) {
+
+	int LOC = 0;
+	int blank = 0;
+	int comment = 0;
+	bool incomment = false; 
+	
+	srcLines = readFileLines(file); 
+		
+	for (line <- srcLines) {	
+		if (/^\s*\/\/\s*\w*/ := line) {
+			comment += 1;
+		} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
+			comment += 1;
+		}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
+			LOC += 1;
+		}else if (/^\s*\/\*\s*/ := line){
+			incomment = true;
+			comment += 1;
+		} else if (/\s*\*\/\s*$/ := line){
+			comment += 1;
+			incomment = false;
+				
+		} else if (/^\s*$/ := line) {
+			blank += 1;
+		} else {
+			if (!incomment) {
+				LOC += 1;
+			} else {
+				comment += 1;
+				}
+			}
+		}
+		tuple [int LOC, int blanklines, int comments] R = <LOC,blank,comments>;
+		return R;
+}
+
+// todo fix thing. 
+public int getLOCMethod(loc file) {
+
+	int LOC = 0;
+	int blank = 0;
+	int comment = 0;
+	bool incomment = false; 
+	
+	srcLines = readFileLines(file); 
+		
+	for (line <- srcLines) {	
+		if (/^\s*\/\/\s*\w*/ := line) {
+			comment += 1;
+		} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
+			comment += 1;
+		}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
+			LOC += 1;
+		}else if (/^\s*\/\*\s*/ := line){
+			incomment = true;
+			comment += 1;
+		} else if (/\s*\*\/\s*$/ := line){
+			comment += 1;
+			incomment = false;
+				
+		} else if (/^\s*$/ := line) {
+			blank += 1;
+		} else {
+			if (!incomment) {
+				LOC += 1;
+			} else {
+				comment += 1;
+				}
+			}
+		}
+		return LOC;
+}
+
+public map[loc, int] getUnitsSize(M3 project) {
+	map[loc,int] unitSizes = ();
+	for (method <- methods(project)) {
+		unitSizes += (method: getLOCFromFile(method));
+	}
+	return unitSizes;
 }
 
 
-public void setup() {
-	//
-	myModel = createM3FromEclipseProject(	|project://RascalTestProject|);
+public void setup(loc project, bool debug) {
+	myModel = createM3FromEclipseProject(project);
 	list[loc] parsed = [];
-//	myModel = createM3FromEclipseProject(	|project://JavaTest2|);
+	//myModel = createM3FromEclipseProject(	|project://JavaTest2|);
 	///iprintln(myModel);
 	///iprintln(myModel@containment);
+	totalLOC = 0;
+	containmentLocs = ();
 	
 	for (class <- classes(myModel)) {
 		list[loc] units = [c | c <- invert(myModel@containment)[class], c.scheme == "java+compilationUnit"];
-	
 		for (loc unit <- units){
-			iprintln(unit);
+			iprintln("Parsing: <unit>");
 			if (unit notin parsed) {
-				getLOCFromFile(unit, true);
+				containmentLocs += (unit: getLOCFromFile(unit, debug));
 				parsed += unit;
 			}
 		}
+	}	
+	// aggregate results
+	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
+	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
+	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
+	iprintln("Total LOC: <totalLinesOfCode>");
+	iprintln("Total Blank lines: <totalBlankLines>");
+	iprintln("Total Comments: <totalComments>");
+	
+	// calculate unit size
+	unitsizes = getUnitsSize(myModel);
+	//iprintln ("Unit Sizes <unitsizes>");
+}
+
+public void getMetrics(bool debug){
+	list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,|project://smallsql0.21_src|];
+	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	println("Starting metrics analysis on <size(projects)> projects");
+	
+	for (project <- projects) {
+		println("Analyzing project <project>");
+		setup(project, debug);
 	}
+
 }

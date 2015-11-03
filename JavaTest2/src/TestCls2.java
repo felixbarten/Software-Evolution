@@ -9,6 +9,12 @@ public class TestCls2 {
 		 * multiline.
 		*/
 		
+		/*
+		 * 
+		 */ System.out.println("sadfasdfasdfad");
+		
+		 System.out.println("comment hell inc.");/*
+		 */		 
 		// /*
 		
 		
