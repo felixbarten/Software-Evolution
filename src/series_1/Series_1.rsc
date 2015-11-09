@@ -181,12 +181,49 @@ public tuple[int,int,int] getLOC(loc location, bool debug) {
 	return <LOC,blankLines,comments>;
 }
 
-public map[loc, tuple[int,int,int]] getUnitsSize(M3 project) {
-	map[loc,tuple[int,int,int]] unitSizes = ();
+public str getUnitsSize(M3 project, int totalLOC) {
+	rel[str, int, int] unitSizes = {};
+	int moderate = 0;
+	int high = 0;
+	int simple = 0;
+	int vhigh = 0;
+
 	for (method <- methods(project)) {
-		unitSizes += (method: getLOC(method, false));
+		LOC = getLOC(method, false)[0];
+		category = getMethodLOCCategory(LOC); 
+		unit = {<method.path, LOC, category>};
+		unitSizes += unit;
+		switch(category){
+			case 2:
+				vhigh += LOC;
+			case 3:
+				high += LOC;
+			case 4:
+				moderate += LOC;
+			case 5:
+				simple += LOC;			
+		}
 	}
-	return unitSizes;
+	percentageModerate = moderate/totalLOC*100;
+	percentageHigh = high/totalLOC*100;
+	percentageVeryHigh = vhigh/totalLOC*100;
+	percentageSimple = simple/totalLOC*100;
+	str unitSizeCategory = "";
+	
+	if (percentageModerate <= 25 && percentageHigh == 0 && percentageVeryHigh == 0) {
+		unitSizeCategory = "++";
+	} else if (percentageModerate > 25 && percentageModerate <= 30 && percentageHigh <= 5 && percentageVeryHigh == 0) {
+		unitSizeCategory = "+";
+	} else if (percentageModerate > 30 && percentageModerate <= 40 && percentageHigh <= 10 && percentageVeryHigh == 0) {
+		unitSizeCategory = "0";
+	} else if (percentageModerate > 40 && percentageModerate <= 50 && percentageHigh <= 15 && percentageVeryHigh <= 5) {
+		unitSizeCategory = "-";
+	} else if (percentageModerate > 50 || percentageHigh > 15 || percentageVeryHigh > 5){
+		unitSizeCategory = "--";
+	}
+	prettyPrintUnitSize(unitSizes); 
+	
+	return unitSizeCategory;
 }
 
 public void setup(loc project, bool debug) {
@@ -218,10 +255,51 @@ public void setup(loc project, bool debug) {
 	iprintln("Total Comments: <totalComments>");
 	
 	// calculate unit size
-	unitsizes = getUnitsSize(myModel);
-	// todo print func.
-	//iprintln ("Unit Sizes <unitsizes>");
+	unitsizes = getUnitsSize(myModel, totalLinesOfCode);
+ 	iprintln("Unit Size Category for project: <unitsizes>");
 }
+
+public void prettyPrintUnitSize(rel[str, int, int] unitsizes) {
+	iprintln ("Unit Sizes:");
+	for (unit <- unitsizes) {
+		iprintln("Method: <unit[0]> LOC: <unit[1]> Judgement: <printVerdict(unit[2])>");
+	}
+
+}
+public str printVerdict(int verdict) {
+	str strVerdict = "";
+	switch(verdict) {
+		case 5: 
+			strVerdict = "++";
+		case 4: 
+			strVerdict = "+";
+		case 3: 
+			strVerdict = "+/-";
+		case 2:
+			strVerdict = "-";
+		case 1: 
+			strVerdict = "--";
+		default:
+			strVerdict = "unknown";
+	}
+	return strVerdict;
+}
+
+public int getMethodLOCCategory(LOC) {
+	if (LOC >= 0 && LOC <= 20) {
+		return 5;
+	} else if (LOC > 20 && LOC <= 50) {
+		return 4;
+	} else if (LOC > 50 && LOC <= 100) {
+		return 3;
+	} else if (LOC > 100) {
+		return 2;
+	} else {
+		// should never reach this
+		return 1;
+	}
+}
+
 
 public void getMetrics(bool debug){
 	// Don't run on hsqldb right now
