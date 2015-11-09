@@ -181,7 +181,7 @@ public tuple[int,int,int] getLOC(loc location, bool debug) {
 	return <LOC,blankLines,comments>;
 }
 
-public str getUnitsSize(M3 project, int totalLOC) {
+public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC) {
 	rel[str, int, int] unitSizes = {};
 	int moderate = 0;
 	int high = 0;
@@ -204,10 +204,10 @@ public str getUnitsSize(M3 project, int totalLOC) {
 				simple += LOC;			
 		}
 	}
-	percentageModerate = moderate/totalLOC*100;
-	percentageHigh = high/totalLOC*100;
-	percentageVeryHigh = vhigh/totalLOC*100;
-	percentageSimple = simple/totalLOC*100;
+	real percentageModerate = moderate/totalLOC*100.0;
+	real percentageHigh = high/totalLOC*100.0;
+	real percentageVeryHigh = vhigh/totalLOC*100.0;
+	real percentageSimple = simple/totalLOC*100.0;
 	str unitSizeCategory = "";
 	
 	if (percentageModerate <= 25 && percentageHigh == 0 && percentageVeryHigh == 0) {
@@ -223,7 +223,7 @@ public str getUnitsSize(M3 project, int totalLOC) {
 	}
 	prettyPrintUnitSize(unitSizes); 
 	
-	return unitSizeCategory;
+	return <unitSizeCategory, unitSizes>;
 }
 
 public void setup(loc project, bool debug) {
@@ -256,7 +256,10 @@ public void setup(loc project, bool debug) {
 	
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode);
- 	iprintln("Unit Size Category for project: <unitsizes>");
+ 	iprintln("Unit Size Category for project: <unitsizes[0]>");
+ 	
+ 	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
+ 	iprintln(duplicates);
 }
 
 public void prettyPrintUnitSize(rel[str, int, int] unitsizes) {
@@ -312,5 +315,43 @@ public void getMetrics(bool debug){
 		setup(project, debug);
 	}
 
+}
+
+public int getDuplicates(M3 model, rel [str, int, int] unitsizes, bool debug, int totalLOC) {
+	//list[list[loc]] duplicates = [];
+	list[list[str]] duplicateLines = [];
+	list[list[str]] duplicateLineSets = [];
+	int duplicates = 0;
+	for (class <- classes(model)) {
+		if (getLOC(class, debug)[0] < 6) {
+			continue;
+		}
+		
+		list[str] srcLines = [];
+		for (line <- readFileLines(class)) {
+			srcLines += trim(line);
+		}
+		
+		int begin = 0;
+		int end = 5;
+		while (end < size(srcLines)){
+			list[str] slice = srcLines[begin..end];
+
+			if (slice in duplicateLines) {
+				duplicates += 1;
+				duplicateLineSets = push(slice, duplicateLineSets);
+			} else {
+				duplicateLines = push(slice, duplicateLines);
+			}
+			begin += 1;
+			end += 1;
+		}
+	}
+	iprintln(duplicateLineSets);
+	println("duplicates <duplicates>");
+	real percentageDuplicates = duplicates *6.0 /totalLOC * 100.0;
+	iprintln("Percentage of duplications: <percentageDuplicates>%");
+	
+	return duplicates;
 }
 
