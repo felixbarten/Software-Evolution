@@ -101,8 +101,7 @@ public void createAST() {
 		} else {
 			println("THIS IS S DECLARATION");
 		}
-		*/
-		
+		*/	
 	}
 	println(LOC);
 	
@@ -113,76 +112,7 @@ public void createAST() {
 	println(LOC);	
 }
 
-public void getLOCs(bool debug) {
-	list[loc] projects = [ |project://RascalTestProject|, |project://JavaTest2|];
-	for (project <- projects) {
-		getLOC(project, debug);
-	}
-	
-}
-
-public void getLOC(loc project, bool debug) {
-
-	myModel = createM3FromEclipseProject(project);	
-	projectAST = createAstsFromEclipseProject(project, true);
-
-	int LOC = 0;
-	int blank = 0;
-	int comment = 0;
-	bool incomment = false; 
-	
-	for (c <- classes(myModel)){ 
-		srcLines = readFileLines(c); 	
-		for (line <- srcLines) {	
-			if (/^\s*\/\/\s*\w*/ := line) {
-				if (debug)
-					println("single line comment: <line>");
-				comment += 1;
-			} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
-				if (debug)
-					println("single line multiline");
-				comment += 1;
-			}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
-				if (debug)
-					println("single line multiline with code");
-				LOC += 1;
-			}else if (/^\s*\/\*\s*/ := line){
-				incomment = true;
-				comment += 1;
-				if (debug)
-					println("start multiline comment");
-				
-			} else if (/\s*\*\/\s*$/ := line){
-				if (debug)
-					println("end multiline comment");
-				comment += 1;
-				incomment = false;
-				
-			} else if (/^\s*$/ := line) {
-				blank += 1;
-				if (debug)
-					println("Blank: <line>");
-			} else {
-				if (!incomment) {
-					if (debug)
-						println("code: <line>");
-					LOC += 1;
-				} else {
-					if (debug)
-						println("comment: <line>");
-					comment += 1;
-				}
-			}
-			
-		}
-		
-	}
-}
-
-public tuple[int,int,int] getLOCFromFile(loc location, bool debug) {
-	//myModel = createM3FromEclipseFile(file);	
-	//projectAST = create(file, true);
-
+public tuple[int,int,int] getLOC(loc location, bool debug) {
 	int LOC = 0;
 	int blankLines = 0;
 	int comments = 0;
@@ -251,46 +181,10 @@ public tuple[int,int,int] getLOCFromFile(loc location, bool debug) {
 	return <LOC,blankLines,comments>;
 }
 
-public tuple[int,int,int] getLOCFile(loc file) {
-
-	int LOC = 0;
-	int blank = 0;
-	int comment = 0;
-	bool incomment = false; 
-	
-	srcLines = readFileLines(file); 
-		
-	for (line <- srcLines) {	
-		if (/^\s*\/\/\s*\w*/ := line) {
-			comment += 1;
-		} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
-			comment += 1;
-		}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
-			LOC += 1;
-		}else if (/^\s*\/\*\s*/ := line){
-			incomment = true;
-			comment += 1;
-		} else if (/\s*\*\/\s*$/ := line){
-			comment += 1;
-			incomment = false;
-				
-		} else if (/^\s*$/ := line) {
-			blank += 1;
-		} else {
-			if (!incomment) {
-				LOC += 1;
-			} else {
-				comment += 1;
-				}
-			}
-		}
-		tuple [int LOC, int blanklines, int comments] R = <LOC,blank,comments>;
-		return R;
-}
 public map[loc, tuple[int,int,int]] getUnitsSize(M3 project) {
 	map[loc,tuple[int,int,int]] unitSizes = ();
 	for (method <- methods(project)) {
-		unitSizes += (method: getLOCFromFile(method, false));
+		unitSizes += (method: getLOC(method, false));
 	}
 	return unitSizes;
 }
@@ -307,9 +201,10 @@ public void setup(loc project, bool debug) {
 	for (class <- classes(myModel)) {
 		list[loc] units = [c | c <- invert(myModel@containment)[class], c.scheme == "java+compilationUnit"];
 		for (loc unit <- units){
-			iprintln("Parsing: <unit>");
+			if (debug) 
+				iprintln("Parsing: <unit>");
 			if (unit notin parsed) {
-				containmentLocs += (unit: getLOCFromFile(unit, debug));
+				containmentLocs += (unit: getLOC(unit, debug));
 				parsed += unit;
 			}
 		}
@@ -324,10 +219,12 @@ public void setup(loc project, bool debug) {
 	
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel);
+	// todo print func.
 	//iprintln ("Unit Sizes <unitsizes>");
 }
 
 public void getMetrics(bool debug){
+	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
 	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 	println("Starting metrics analysis on <size(projects)> projects");
@@ -339,11 +236,3 @@ public void getMetrics(bool debug){
 
 }
 
-
-public void regexhell() {
-	str d= "/* safdasf */";
-	if (/\/\*(?!\*\/)<comment:[^\*\/]*>/ := d) {
-		println(comment);
-		println("match");
-	}
-}
