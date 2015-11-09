@@ -340,11 +340,16 @@ public int getDuplicates(M3 model, rel [str, int, int] unitsizes, bool debug, in
 			if (slice in duplicateLines) {
 				duplicates += 1;
 				duplicateLineSets = push(slice, duplicateLineSets);
+				if(end+6 > size(srcLines) -1){
+				 end = size(srcLines);
+				}else{
+					end +=6;	
+				}
 			} else {
 				duplicateLines = push(slice, duplicateLines);
+				begin += 1;
+				end += 1;
 			}
-			begin += 1;
-			end += 1;
 		}
 	}
 	iprintln(duplicateLineSets);
