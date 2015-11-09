@@ -181,10 +181,10 @@ public tuple[int,int,int] getLOC(loc location, bool debug) {
 	return <LOC,blankLines,comments>;
 }
 
-public map[loc, tuple[int,int,int]] getUnitsSize(M3 project) {
-	map[loc,tuple[int,int,int]] unitSizes = ();
+public map[str, int] getUnitsSize(M3 project) {
+	map[str, int] unitSizes = ();
 	for (method <- methods(project)) {
-		unitSizes += (method: getLOC(method, false));
+		unitSizes += (method.path: getLOC(method, false)[0]);
 	}
 	return unitSizes;
 }
@@ -220,8 +220,53 @@ public void setup(loc project, bool debug) {
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel);
 	// todo print func.
-	//iprintln ("Unit Sizes <unitsizes>");
+	prettyPrintUnitSize(unitsizes);  
 }
+
+public void prettyPrintUnitSize(map[str, int] unitsizes) {
+	iprintln ("Unit Sizes:");
+	for (unit <- unitsizes) {
+		// pretty print here?
+		LOC = unitsizes[unit];
+		verdict = getMethodLOCVerdict(LOC);
+		iprintln("Method: <unit> LOC: <LOC> Judgement: <printVerdict(verdict)>");
+	}
+
+}
+public str printVerdict(int verdict) {
+	str strVerdict = "";
+	switch(verdict) {
+		case 5: 
+			strVerdict = "++";
+		case 4: 
+			strVerdict = "+";
+		case 3: 
+			strVerdict = "+/-";
+		case 2:
+			strVerdict = "-";
+		case 1: 
+			strVerdict = "--";
+		default:
+			strVerdict = "unknown";
+	}
+	return strVerdict;
+}
+
+public int getMethodLOCVerdict(LOC) {
+	if (LOC >= 0 && LOC <= 20) {
+		return 5;
+	} else if (LOC > 20 && LOC <= 50) {
+		return 4;
+	} else if (LOC > 50 && LOC <= 100) {
+		return 3;
+	} else if (LOC > 100) {
+		return 2;
+	} else {
+		// should never reach this
+		return 1;
+	}
+}
+
 
 public void getMetrics(bool debug){
 	// Don't run on hsqldb right now
