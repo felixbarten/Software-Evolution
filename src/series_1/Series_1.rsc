@@ -179,7 +179,7 @@ public void getLOC(loc project, bool debug) {
 	}
 }
 
-public tuple[int,int,int] getLOCFromFile(loc file, bool debug) {
+public tuple[int,int,int] getLOCFromFile(loc location, bool debug) {
 	//myModel = createM3FromEclipseFile(file);	
 	//projectAST = create(file, true);
 
@@ -188,7 +188,7 @@ public tuple[int,int,int] getLOCFromFile(loc file, bool debug) {
 	int comments = 0;
 	bool incomment = false; 
 	
-	srcLines = readFileLines(file); 	
+	srcLines = readFileLines(location); 	
 	for (line <- srcLines) {	
 		if (/^\s*\/\/\s*\w*/ := line) {
 			if (debug)
@@ -215,7 +215,7 @@ public tuple[int,int,int] getLOCFromFile(loc file, bool debug) {
 			}
 			incomment = false; 
 			LOC += 1;
-		}	else if (/^\s*\/\*\*?[\s\w\=\.\,\?]*$/ := line){
+		}	else if (/^\s*\/\*\*?[^\*\/]*$/ := line){
 			incomment = true;
 			comments += 1;
 			if (debug)
@@ -242,10 +242,12 @@ public tuple[int,int,int] getLOCFromFile(loc file, bool debug) {
 			}
 			
 		}
-	println("Results for file: <file>");
-	println("Lines of Code: <LOC>");
-	println("Commented lines: <comments>");
-	println("Blank lines: <blankLines>");
+	if (debug) {
+		println("Results for file: <file>");
+		println("Lines of Code: <LOC>");
+		println("Commented lines: <comments>");
+		println("Blank lines: <blankLines>");
+	}
 	return <LOC,blankLines,comments>;
 }
 
@@ -285,52 +287,13 @@ public tuple[int,int,int] getLOCFile(loc file) {
 		tuple [int LOC, int blanklines, int comments] R = <LOC,blank,comments>;
 		return R;
 }
-
-// todo fix thing. 
-public int getLOCMethod(loc file) {
-
-	int LOC = 0;
-	int blank = 0;
-	int comment = 0;
-	bool incomment = false; 
-	
-	srcLines = readFileLines(file); 
-		
-	for (line <- srcLines) {	
-		if (/^\s*\/\/\s*\w*/ := line) {
-			comment += 1;
-		} else if (/^\s*\/\*[\w\s]*\*\/$/ := line) {
-			comment += 1;
-		}  else if (/^\s*\/\*[\w\s]*\*\/[\s\w]*/ := line) {
-			LOC += 1;
-		}else if (/^\s*\/\*\s*/ := line){
-			incomment = true;
-			comment += 1;
-		} else if (/\s*\*\/\s*$/ := line){
-			comment += 1;
-			incomment = false;
-				
-		} else if (/^\s*$/ := line) {
-			blank += 1;
-		} else {
-			if (!incomment) {
-				LOC += 1;
-			} else {
-				comment += 1;
-				}
-			}
-		}
-		return LOC;
-}
-
-public map[loc, int] getUnitsSize(M3 project) {
-	map[loc,int] unitSizes = ();
+public map[loc, tuple[int,int,int]] getUnitsSize(M3 project) {
+	map[loc,tuple[int,int,int]] unitSizes = ();
 	for (method <- methods(project)) {
-		unitSizes += (method: getLOCFromFile(method));
+		unitSizes += (method: getLOCFromFile(method, false));
 	}
 	return unitSizes;
 }
-
 
 public void setup(loc project, bool debug) {
 	myModel = createM3FromEclipseProject(project);
@@ -365,8 +328,8 @@ public void setup(loc project, bool debug) {
 }
 
 public void getMetrics(bool debug){
-	list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,|project://smallsql0.21_src|];
-	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
+	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 	println("Starting metrics analysis on <size(projects)> projects");
 	
 	for (project <- projects) {
@@ -374,4 +337,13 @@ public void getMetrics(bool debug){
 		setup(project, debug);
 	}
 
+}
+
+
+public void regexhell() {
+	str d= "/* safdasf */";
+	if (/\/\*(?!\*\/)<comment:[^\*\/]*>/ := d) {
+		println(comment);
+		println("match");
+	}
 }
