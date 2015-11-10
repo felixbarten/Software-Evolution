@@ -37,16 +37,12 @@ public void setup(loc project, bool debug, loc logfile) {
 	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
 
 	//Display LOC results
-	if(debug){
-		iprintln("Total LOC: <totalLinesOfCode>");
-		iprintln("Total Blank lines: <totalBlankLines>");
-		iprintln("Total Comments: <totalComments>");
-	}
+	iprintln("Total LOC: <totalLinesOfCode>");
+	iprintln("Total Blank lines: <totalBlankLines>");
+	iprintln("Total Comments: <totalComments>");
 	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
  	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
-	
 	printLOC(containmentLocs, logfile);
-
 	
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
@@ -70,10 +66,10 @@ public void setup(loc project, bool debug, loc logfile) {
 public void getMetrics(bool debug){
 	value begintime = now();
 	// Don't run on hsqldb right now
-	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
+	list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,|project://smallsql0.21_src|];
 
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 //	list[loc] projects = [|project://testJava|];
 

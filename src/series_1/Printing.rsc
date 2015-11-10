@@ -33,9 +33,6 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
 	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
 	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
-	iprintln("Total LOC: <totalLinesOfCode>");
-	iprintln("Total Blank lines: <totalBlankLines>");
-	iprintln("Total Comments: <totalComments>");
 	
 	appendToFile(logfile, "\<h2\>Lines of code\</h2\>");
 	appendToFile(logfile, "Total LOC: <totalLinesOfCode>\</br\>");
