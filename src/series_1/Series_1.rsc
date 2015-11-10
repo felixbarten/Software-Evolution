@@ -11,6 +11,16 @@ import Prelude;
 import series_1::Scoring;
 import Set;
 
+public void logData() {
+	loc reportFile = |project://SoftwareEvolution/reports/report.html|;
+	println("writing report");
+	writeFile(reportFile, "\\\<html\\\<");		
+
+
+
+}
+
+
 public void setup(loc project, bool debug) {
 	myModel = createM3FromEclipseProject(project);
 	list[loc] parsed = [];
