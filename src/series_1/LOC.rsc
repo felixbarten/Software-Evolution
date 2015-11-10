@@ -88,13 +88,13 @@ public int calcLOCScore(int LOCs){
 	
 	if(LOCs < 66*kloc){
 		result = 5;	
-	} else if (LOCs > 66*klocs && LOCs <= 246*klocs){
+	} else if (LOCs > 66*kloc && LOCs <= 246*kloc){
 		result = 4;
-	} else if (LOCs > 246*klocs && LOCs <= 665*klocs){
+	} else if (LOCs > 246*kloc && LOCs <= 665*kloc){
 		result = 3;
-	} else if (LOCs > 665*klocs && LOCs <= 1310*klocs){
+	} else if (LOCs > 665*kloc && LOCs <= 1310*kloc){
 		result = 2;
-	} else if (LOCs > 1310*klocs){
+	} else if (LOCs > 1310*kloc){
 		result = 1;
 	} else { //Error
 		result = -1;
