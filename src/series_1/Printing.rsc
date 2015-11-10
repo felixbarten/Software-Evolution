@@ -4,7 +4,7 @@ import Prelude;
 import series_1::LOC;
 import series_1::Scoring;
 import series_1::Duplication;
-import util;
+import series_1::Util;
 
 public loc startReport() {
 	loc logfile = |project://Software-Evolution/reports/report.html|;
@@ -16,6 +16,7 @@ public loc startReport() {
 	appendToFile(logfile, "\</header\>\<body\>");
 	appendToFile(logfile, "\<script src=\"js/bootstrap.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<div class=\"container\"\>");
+	appendToFile(logfile, "\<div class=\"row\"\>");
 
 	return logfile;	
 	
@@ -48,14 +49,26 @@ public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile
 	appendToFile(logfile, "\<h2\>Unit Size per method\</h2\>");
 	
 	//appendToFile(logfile, "\<div class=\".table-responsive\"\>");
-	appendToFile(logfile, "\<table class=\"table table-striped table-bordered\" \>\<thead\>\<th style=\"width:450px;\"\>Method Name\</th\>\<th\>LOC\</th\>\<th\>Judgement\</th\>\</thead\>\<tbody\>");
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>\<thead\>\<th class=\"col-md-6\"\>Method Name\</th\>\<th class=\"col-md-3\"\>LOC\</th\>\<th class=\"col-md-3\"\>Judgement\</th\>\</thead\>\<tbody\>");	
 	for (unit <- unitsizes[1]) {
-			println(unit);
+		// omit small unit sizes
+		if (size(unitsizes[1]) <= 20) {
 			appendToFile(logfile, "\<tr\>");
-			appendToFile(logfile, "\<td style=\"word-wrap:break-word;\"\><unit[0]>\</td\>");
+			appendToFile(logfile, "\<td style=\"\"\><unit[0]>\</td\>");
 			appendToFile(logfile, "\<td\><unit[1]>\</td\>");
 			appendToFile(logfile, "\<td\><unit[2]>\</td\>");
 			appendToFile(logfile, "\</tr\>");
+		} else if (unit[1] > 20) { 
+			appendToFile(logfile, "\<tr\>");
+			appendToFile(logfile, "\<td style=\"\"\><unit[0]>\</td\>");
+			appendToFile(logfile, "\<td\><unit[1]>\</td\>");
+			appendToFile(logfile, "\<td\><unit[2]>\</td\>");
+			appendToFile(logfile, "\</tr\>");			
+		}
+	}
+	if (size(unitsizes[1]) > 20) {
+		appendToFile(logfile, "Results lower than 20 LOC ommitted");
+		
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>");
 	//appendToFile(logfile, "\</div\>");
@@ -68,14 +81,26 @@ public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile
 
 public void printComplexity(tuple[int,lrel[str,int,int]] cc, loc logfile) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
-	appendToFile(logfile, "\<table class=\"table table-striped table-bordered\" \>\<thead\>\<th style=\"width:450px;\"\>Method Name\</th\>\<th\>LOC\</th\>\<th\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	
 	for (method <- cc[1]) {
-		appendToFile(logfile, "\<tr\>");
-		appendToFile(logfile, "\<td\><method[0].methodname>\</td\>");
-		appendToFile(logfile, "\<td\><method[1]>\</td\>");
-		appendToFile(logfile, "\<td\><method[2]>\</td\>");
-		appendToFile(logfile, "\</tr\>");
+		if (size(cc[1]) < 20) {
+			appendToFile(logfile, "\<tr\>");
+			appendToFile(logfile, "\<td\><method[0]>\</td\>");
+			appendToFile(logfile, "\<td\><method[1]>\</td\>");
+			appendToFile(logfile, "\<td\><method[2]>\</td\>");
+			appendToFile(logfile, "\</tr\>");
+		} else if (method[2] >= 5) {
+			appendToFile(logfile, "\<tr\>");
+			appendToFile(logfile, "\<td\><method[0]>\</td\>");
+			appendToFile(logfile, "\<td\><method[1]>\</td\>");
+			appendToFile(logfile, "\<td\><method[2]>\</td\>");
+			appendToFile(logfile, "\</tr\>");
+		}
+	}
+	if (size(cc[1]) > 20) {
+		appendToFile(logfile, "Results lower than 5 CC ommitted");
+		
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>");
 	

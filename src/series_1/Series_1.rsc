@@ -74,7 +74,7 @@ public void getMetrics(bool debug){
 	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	list[loc] projects = [|project://testJava|];
+//	list[loc] projects = [|project://testJava|];
 
 	println("Starting metrics analysis on <size(projects)> projects");
 	logfile = startReport();
