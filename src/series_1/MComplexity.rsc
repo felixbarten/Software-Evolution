@@ -106,5 +106,5 @@ public tuple [ int, lrel[ str, int, int] ] calcCCScore( M3 model,totalLoc){
 		result = 5;	
 	}
 		
-    return <result, take(3,sort(methodCCs, bool(tuple[str,int,int] a, tuple[str,int,int] b){ return a[2] > b[2]; }))>;
+    return <result, sort(methodCCs, bool(tuple[str,int,int] a, tuple[str,int,int] b){ return a[2] > b[2]; })>;
 }
