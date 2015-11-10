@@ -57,15 +57,16 @@ public void setup(loc project, bool debug, loc logfile) {
 	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
  	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
 	
-	
 	printLOC(containmentLocs, logfile);
-	
+
 	
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
  	iprintln("Unit Size Category for project: <unitsizes[0]>");
+
  	printUnitSize(unitsizes, logfile);
 
+ 	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
  	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
  	iprintln("Code Duplication Category: <scoreDup>");
@@ -75,7 +76,6 @@ public void setup(loc project, bool debug, loc logfile) {
     scoreCC = printVerdict(cc[0]);
  	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
  	iprintln("Top 3 Methods CC: <cc[1]>");
-
 }
 
 public void getMetrics(bool debug){
