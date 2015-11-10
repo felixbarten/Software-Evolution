@@ -1,63 +1,74 @@
-module series_1::testParsingLOC
+module series_1::LOC
 
 import IO;
 import Exception;
-import ParseTree;
 import List;
 
-layout Standard = WhitespaceOrComment* !>> [\ \t\n\r] !>> "//";
-
-start syntax LinesOfCode = Statement*;
-
-lexical WhitespaceOrComment 
-  = whitespace: Whitespace
-  | comment: Comment
-  ; 
-
-lexical Whitespace
-  = [\t-\n \a0C-\a0D \ ]
-  ;
-
-lexical Comment =
-  "/**/" 
-  | "//" EOLCommentChars !>> ![\n \a0D] [\ \t\n\r] 
-  | "/*" !>> [*] CommentPart* "*/" 
-  | "/**" !>> [/] CommentPart* "*/" 
-  ;
-lexical BlockCommentChars =
-  ![* \\]+ 
-  ;
-  lexical EOLCommentChars =
-  ![\n \a0D]* 
-  ;
- lexical UnicodeEscape =
-   unicodeEscape: "\\" [u]+ [0-9 A-F a-f] [0-9 A-F a-f] [0-9 A-F a-f] [0-9 A-F a-f] 
-  ;
-lexical EscChar =
-  "\\" 
-  ;
-lexical CommentPart =
-  UnicodeEscape 
-  | BlockCommentChars !>> ![* \\] 
-  | EscChar !>> [\\ u] 
-  | "*" !>> [/] 
-  | "\\\\" 
-  ;
-
-lexical Statement = ![WhitespaceOrComment];
-
-
-int getLOCLines(loc locc) {
-	Tree tree;
-	try {
-		tree = parse(#start[LinesOfCode], readFile(locc));
-	} catch Error(e): {
-		println("Error <e> at <l>");
+public tuple[int,int,int] getLOC(loc location, bool debug) {
+	int LOC = 0;
+	int blankLines = 0;
+	int comments = 0;
+	bool incomment = false; 
+	
+	srcLines = readFileLines(location); 	
+	for (line <- srcLines) {	
+		if (/^\s*\/\/\s*\w*/ := line) {
+			if (debug)
+				println("single line comment: <line>");
+			comments += 1;
+		} else if (/((\s*\/\*[\w\s]+\*\/)+[\s\w]+(\/\/[\s\w]+$)*)+/ := line) {
+			if (debug) {
+				println("multiline and code intertwined: <line>");
+			}
+			LOC += 1;
+			
+		}else if (/^\s*\/\*\*?[\w\s\?\@]*\*\/$/ := line) {
+			if (debug)
+				println("single line multiline:  <line>");
+			comments += 1;
+		}  else if (/\s*\/\*[\w\s]*\*\/[\s\w]+/ := line) {
+			if (debug)
+				println("multiline with code: <line>");
+			LOC += 1;
+		}	else if (/^[\s\w]*\*\/\s*\w+[\s\w]*/ := line) {
+			// end of multiline + code == loc
+			if (debug) {
+				println("end of multiline + code:  <line>");
+			}
+			incomment = false; 
+			LOC += 1;
+		}	else if (/^\s*\/\*\*?[^\*\/]*$/ := line){
+			incomment = true;
+			comments += 1;
+			if (debug)
+				println("start multiline comment:  <line>");
+				
+		} else if (/\s*\*\/\s*$/ := line){
+			if (debug)
+				println("end multiline comment: <line>");
+			comments += 1;
+			incomment = false;
+				
+		} else if (/^\s*$/ := line) {
+			blankLines += 1;
+		} else {
+			if (!incomment) {
+				if (debug)
+					println("code: <line>");
+				LOC += 1;
+			} else {
+				if (debug)
+					println("comment: <line>");
+				comments += 1;
+				}
+			}
+			
+		}
+	if (debug) {
+		println("Results for file: <file>");
+		println("Lines of Code: <LOC>");
+		println("Commented lines: <comments>");
+		println("Blank lines: <blankLines>");
 	}
-
-	if ((LinesOfCode)`<Statement* st>` := tree.top) {
-		return sum([ *{ s@\loc.begin.line | Statement s <- st}]);
-	}
-
-	return 0;
+	return <LOC,blankLines,comments>;
 }

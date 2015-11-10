@@ -22,5 +22,13 @@ public class TestCls2 {
 		int i = 0;
 
 		/* single line multiline with code */ System.out.println("Hello again");
+		
+		/*
+		 * multiline.
+		*/
+		
+		/*
+		 * 
+		 */ System.out.println("sadfasdfasdfad");
 	}
 }
