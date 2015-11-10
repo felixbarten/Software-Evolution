@@ -9,28 +9,15 @@ import series_1::UnitSize;
 import series_1::Duplication;
 import Prelude;
 import series_1::Scoring;
+import series_1::Printing;
 import Set;
-
-public loc startReport() {
-	loc reportFile = |project://Software-Evolution/reports/report.html|;
-	println("writing report");
-	// write or overrwrite file. 
-	str msg  = "\<html\>\<body\>";
-	
-	writeFile(reportFile, msg);	
-	return reportFile;	
-	
-}
-public void endReport(loc file) {
-	appendToFile(file, "\</body\>\n\</html\>");
-}
 
 public void setup(loc project, bool debug, loc logfile) {
 	myModel = createM3FromEclipseProject(project);
 	list[loc] parsed = [];
 	totalLOC = 0;
 	containmentLocs = ();
-	appendToFile(logfile, "\<h1\>Results for project: <project>\</h1\>\</br\>");
+	appendToFile(logfile, "\<h1\>Results for project: <project>\</h1\>");
 	
 	for (class <- classes(myModel)) {
 		list[loc] units = [c | c <- invert(myModel@containment)[class], c.scheme == "java+compilationUnit"];
@@ -63,19 +50,20 @@ public void setup(loc project, bool debug, loc logfile) {
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
  	iprintln("Unit Size Category for project: <unitsizes[0]>");
-
  	printUnitSize(unitsizes, logfile);
 
  	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
  	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
  	iprintln("Code Duplication Category: <scoreDup>");
+ 	printDuplication(duplicates, logfile);
  	
  	//Calcute Mcabe CC
     cc =  calcCCScore(myModel, totalLinesOfCode);
     scoreCC = printVerdict(cc[0]);
  	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
- 	iprintln("Top 3 Methods CC: <cc[1]>");
+ 	iprintln("Top 3 Methods CC: <take(3,cc[1])>");
+ 	printComplexity(cc, logfile);
 }
 
 public void getMetrics(bool debug){
@@ -95,42 +83,4 @@ public void getMetrics(bool debug){
 }
 
 
-// print methods
-
-public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) {
-	// aggregate results
-	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
-	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
-	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
-	iprintln("Total LOC: <totalLinesOfCode>");
-	iprintln("Total Blank lines: <totalBlankLines>");
-	iprintln("Total Comments: <totalComments>");
-	
-	appendToFile(logfile, "\<h2\>Lines of code\</h2\>");
-	appendToFile(logfile, "Total LOC: <totalLinesOfCode>\</br\>");
-	appendToFile(logfile, "Total Blank lines: <totalBlankLines>\</br\>");
-	appendToFile(logfile, "Total Comments: <totalComments>\</br\>");
-}
-public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile) {
-	appendToFile(logfile, "\<h2\>Unit Size per method\</h2\>");
-	
-	appendToFile(logfile, "\<table style=\"text-align:left;\"\>\<thead\>\<th\>Method Name\</th\>\<th\>LOC\</th\>\<th\>Judgement\</th\>\</thead\>\<tbody\>");
-	for (unit <- unitsizes[1]) {
-			appendToFile(logfile, "\<tr\>");
-			appendToFile(logfile, "\<td\><unit[0]>\</td\>");
-			appendToFile(logfile, "\<td\><unit[1]>\</td\>");
-			appendToFile(logfile, "\<td\><unit[2]>\</td\>");
-			appendToFile(logfile, "\</tr\>");
-	}
-	appendToFile(logfile, "\</tbody\>\</table\>");
-	
-	appendToFile(logfile, "\<h2\>Unit Size for project\</h2\>");
-	
-	appendToFile(logfile, "The unit size for this project was rated \<strong\><unitsizes[0]>\</strong\>");
-	
-}
-
-public void printComplexity() {
-	
-}
 
