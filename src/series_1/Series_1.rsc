@@ -69,8 +69,8 @@ public void setup(loc project, bool debug, loc logfile) {
 public void getMetrics(bool debug){
 	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
-//	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
+	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 
 	println("Starting metrics analysis on <size(projects)> projects");
 	logfile = startReport();
