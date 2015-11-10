@@ -5,8 +5,8 @@ import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import IO;
 import List;
+import series_1::LOC;
 
-import series_1::Series_1;
 
 public int calcMethodCC(methodAST){
 
@@ -41,13 +41,23 @@ test bool t1(){
 
 public list[tuple[str,int,int]] calcProjectCC(M3 input){
 	 model = input;
+
 	 return for(m <- methods(model)){
 	 	methodAST = getMethodASTEclipse(m,model=model);
 	 	append <m.path, getLOC(m, false)[0], calcMethodCC(methodAST)>;
 	 }
 }
 
-public tuple[int,lrel[str,int,int]] calcCCScore(totalLoc, M3 model){
+/*
+	Uses the following thresholds to determine score(descending):
+		<M ,H ,V>
+		---------
+		<50,15,5>
+		<40,10,0>
+		<30, 5,0>
+		<25, 0,0>
+*/
+public tuple [ int, lrel[ str, int, int] ] calcCCScore( M3 model,totalLoc){
 
 	int low = 0;
 	int moderate = 0;
@@ -79,12 +89,6 @@ public tuple[int,lrel[str,int,int]] calcCCScore(totalLoc, M3 model){
 	//println(high);
 	//println(veryHigh);
 
-	/* Thresholds
-		<50,15,5>
-		<40,10,0>
-		<30, 5,0>
-		<25, 0,0>
-	*/
 	
 	int pM = moderate/totalLoc*100;
 	int pH = high/totalLoc*100;

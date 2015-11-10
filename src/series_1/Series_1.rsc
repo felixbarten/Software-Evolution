@@ -8,14 +8,12 @@ import series_1::MComplexity;
 import series_1::UnitSize;
 import series_1::Duplication;
 import Prelude;
+import series_1::Scoring;
 import Set;
 
 public void setup(loc project, bool debug) {
 	myModel = createM3FromEclipseProject(project);
 	list[loc] parsed = [];
-	//myModel = createM3FromEclipseProject(	|project://JavaTest2|);
-	///iprintln(myModel);
-	///iprintln(myModel@containment);
 	totalLOC = 0;
 	containmentLocs = ();
 	
@@ -34,16 +32,32 @@ public void setup(loc project, bool debug) {
 	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
 	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
 	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
-	iprintln("Total LOC: <totalLinesOfCode>");
-	iprintln("Total Blank lines: <totalBlankLines>");
-	iprintln("Total Comments: <totalComments>");
+
+	//Display LOC results
+	if(debug){
+		iprintln("Total LOC: <totalLinesOfCode>");
+		iprintln("Total Blank lines: <totalBlankLines>");
+		iprintln("Total Comments: <totalComments>");
+	}
+	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
+ 	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
+	
 	
 	// calculate unit size
-	unitsizes = getUnitsSize(myModel, totalLinesOfCode);
+	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
  	iprintln("Unit Size Category for project: <unitsizes[0]>");
- 	
+
+ 	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
- 	iprintln(duplicates);
+ 	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
+ 	iprintln("Code Duplication Category: <scoreDup>");
+ 	
+ 	//Calcute Mcabe CC
+    cc =  calcCCScore(myModel, totalLinesOfCode);
+    scoreCC = printVerdict(cc[0]);
+ 	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
+ 	iprintln("Top 3 Methods CC: <cc[1]>");
+
 }
 
 
