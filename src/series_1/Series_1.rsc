@@ -9,10 +9,11 @@ import series_1::UnitSize;
 import series_1::Duplication;
 import Prelude;
 import series_1::Scoring;
+import series_1::Util;
 import Set;
 
 public loc startReport() {
-	loc reportFile = |project://SoftwareEvolution/reports/report.html|;
+	loc reportFile = |project://Software-Evolution/reports/report.html|;
 	println("writing report");
 	// write or overrwrite file. 
 	str msg  = "\<html\>\<body\>";
@@ -82,7 +83,7 @@ public void getMetrics(bool debug){
 	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	list[loc] projects = [|project://testJava|];
 
 	println("Starting metrics analysis on <size(projects)> projects");
 	logfile = startReport();
@@ -114,10 +115,10 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile) {
 	appendToFile(logfile, "\<h2\>Unit Size per method\</h2\>");
 	
-	appendToFile(logfile, "\<table style=\"text-align:left;\"\>\<thead\>\<th\>Method Name\</th\>\<th\>LOC\</th\>\<th\>Judgement\>\</thead\>\<tbody\>");
+	appendToFile(logfile, "\<table style=\"text-align:left;\"\>\<thead\>\<th\>Method Name\</th\>\<th\>LOC\</th\>\<th\>Judgement\</thead\>\<tbody\>");
 	for (unit <- unitsizes[1]) {
 			appendToFile(logfile, "\<tr\>");
-			appendToFile(logfile, "\<td\><unit[0]>\</td\>");
+			appendToFile(logfile, "\<td\><methodFullName(unit[0])>\</td\>");
 			appendToFile(logfile, "\<td\><unit[1]>\</td\>");
 			appendToFile(logfile, "\<td\><unit[2]>\</td\>");
 			appendToFile(logfile, "\</tr\>");
