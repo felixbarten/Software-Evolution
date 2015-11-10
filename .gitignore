@@ -55,5 +55,7 @@ local.properties
 # sbteclipse plugin
 .target
 
+reports/report.html
+
 # TeXlipse plugin
 .texlipse

@@ -72,3 +72,32 @@ public tuple[int,int,int] getLOC(loc location, bool debug) {
 	}
 	return <LOC,blankLines,comments>;
 }
+
+/*
+	We use the following values(KLOC) from the SIG paper to grade this(descending):
+	0-66
+	66-246
+	246-665
+	665-1310
+	>1310
+	
+*/
+public int calcLOCScore(int LOCs){
+	int kloc = 1000;
+	int result;
+	
+	if(LOCs < 66*kloc){
+		result = 5;	
+	} else if (LOCs > 66*klocs && LOCs <= 246*klocs){
+		result = 4;
+	} else if (LOCs > 246*klocs && LOCs <= 665*klocs){
+		result = 3;
+	} else if (LOCs > 665*klocs && LOCs <= 1310*klocs){
+		result = 2;
+	} else if (LOCs > 1310*klocs){
+		result = 1;
+	} else { //Error
+		result = -1;
+	}
+ 	return result;
+}

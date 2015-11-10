@@ -5,8 +5,9 @@ import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import series_1::LOC;
+import series_1::Scoring;
 
-public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC) {
+public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC, bool debug) {
 	rel[str, int, int] unitSizes = {};
 	int moderate = 0;
 	int high = 0;
@@ -46,29 +47,12 @@ public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC) {
 	} else if (percentageModerate > 50 || percentageHigh > 15 || percentageVeryHigh > 5){
 		unitSizeCategory = "--";
 	}
-	prettyPrintUnitSize(unitSizes); 
-	
+	if(debug){
+		prettyPrintUnitSize(unitSizes); 
+    }	
 	return <unitSizeCategory, unitSizes>;
 }
 
-public str printVerdict(int verdict) {
-	str strVerdict = "";
-	switch(verdict) {
-		case 5: 
-			strVerdict = "++";
-		case 4: 
-			strVerdict = "+";
-		case 3: 
-			strVerdict = "+/-";
-		case 2:
-			strVerdict = "-";
-		case 1: 
-			strVerdict = "--";
-		default:
-			strVerdict = "unknown";
-	}
-	return strVerdict;
-}
 
 public int getMethodLOCCategory(LOC) {
 	if (LOC >= 0 && LOC <= 20) {
