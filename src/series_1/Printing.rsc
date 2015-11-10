@@ -120,3 +120,11 @@ public void printDuplication(tuple [real, int] duplicates, loc logfile) {
 	appendToFile(logfile, "The duplication score for this project is: <printVerdict(calcDuplicationScore(duplicates[0]))>\</br\>");
 
 }
+
+public void printExecutionTime(Duration duration, loc logfile) {
+	durationStr = "Calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	iprintln(durationStr);
+	appendToFile(logfile, durationStr);
+
+
+}

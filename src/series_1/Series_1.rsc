@@ -12,7 +12,7 @@ import series_1::Scoring;
 import series_1::Util;
 import series_1::Printing;
 import Set;
-
+import DateTime;
 public void setup(loc project, bool debug, loc logfile) {
 	myModel = createM3FromEclipseProject(project);
 	list[loc] parsed = [];
@@ -68,11 +68,12 @@ public void setup(loc project, bool debug, loc logfile) {
 }
 
 public void getMetrics(bool debug){
+	value begintime = now();
 	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://RascalTestProject|, |project://JavaTest2|,];
 
-	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
+	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
+	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 //	list[loc] projects = [|project://testJava|];
 
@@ -83,5 +84,9 @@ public void getMetrics(bool debug){
 		println("Analyzing project <project>");
 		setup(project, debug, logfile);
 	}
+	value endtime = now();
+	Duration executionTime = createDuration(begintime,endtime);
+	printExecutionTime(executionTime, logfile);
 	endReport(logfile);
+	
 }
