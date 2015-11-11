@@ -4,7 +4,6 @@ import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import series_1::LOC;
-import IO;
 import Prelude;
 
 public tuple[ real, int] getDuplicates(M3 model, rel [str, int, int] unitsizes, bool debug, int totalLOC) {
@@ -14,10 +13,15 @@ public tuple[ real, int] getDuplicates(M3 model, rel [str, int, int] unitsizes, 
 	list[list[str]] duplicateLineSets = [];
 
 	int duplicates = 0;
+	int classesSize = size(classes(model));
+	int counter = 0;
 
 	for (class <- classes(model)) {
-
-	if (getLOC(class, debug)[0] < 6) continue;
+		if (counter % 100 == 0) {
+			println("Checked <counter> out of <classesSize> classes for duplication");
+		}
+		counter += 1;
+		if (getLOC(class, debug)[0] < 6) continue;
 		
 		list[str] srcLines = [];
 

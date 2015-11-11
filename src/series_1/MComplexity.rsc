@@ -3,10 +3,8 @@ module series_1::MComplexity
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
-import IO;
-import List;
+import Prelude;
 import series_1::LOC;
-
 
 public int calcMethodCC(methodAST){
 
@@ -41,8 +39,13 @@ test bool t1(){
 
 public list[tuple[str,int,int]] calcProjectCC(M3 input){
 	 model = input;
-
+	int counter = 0;
+	int methodSize = size(methods(model)); 
 	 return for(m <- methods(model)){
+	 	if (counter % 100 == 0) {
+	 		println("Calculated complexity for <counter> out of <methodSize> methods");
+	 	}
+	 	counter += 1;
 	 	methodAST = getMethodASTEclipse(m,model=model);
 	 	append <m.path, getLOC(m, false)[0], calcMethodCC(methodAST)>;
 	 }
