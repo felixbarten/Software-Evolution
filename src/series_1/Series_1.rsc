@@ -51,10 +51,10 @@ public void setup(loc project, bool debug, loc logfile) {
 	iprintln("Total Blank lines: <totalBlankLines>");
 	iprintln("Total Comments: <totalComments>");
 	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
+	printLOC(containmentLocs, logfile);
  	Duration LOCDuration = createDuration(beginLOC, now());
 	printMetricCalculationTime(LOCDuration, "Lines Of Code", logfile);	
  	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
-	printLOC(containmentLocs, logfile);
 	// end LOC
 	
 	// start Unit Size
@@ -62,10 +62,10 @@ public void setup(loc project, bool debug, loc logfile) {
 	println("Starting Unit Size calculation");
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
-	Duration UnitSizeDuration = createDuration(beginUnitSize, now());
-	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
  	iprintln("Unit Size Category for project: <unitsizes[0]>");
  	printUnitSize(unitsizes, logfile);
+ 	Duration UnitSizeDuration = createDuration(beginUnitSize, now());
+	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
 	//end Unit Size
 
 	
@@ -75,10 +75,10 @@ public void setup(loc project, bool debug, loc logfile) {
  	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
  	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
- 	Duration DupDuration = createDuration(beginDuplication, now());
-	printMetricCalculationTime(DupDuration, "Duplication", logfile);
- 	iprintln("Code Duplication Category: <scoreDup>");
  	printDuplication(duplicates, logfile);
+ 	Duration DupDuration = createDuration(beginDuplication, now());
+ 	iprintln("Code Duplication Category: <scoreDup>");
+	printMetricCalculationTime(DupDuration, "Duplication", logfile);
  	// end Duplication
  	
  	
@@ -88,11 +88,11 @@ public void setup(loc project, bool debug, loc logfile) {
  	//Calcute Mcabe CC
     cc =  calcCCScore(myModel, totalLinesOfCode);
     scoreCC = printVerdict(cc[0]);
-    Duration CCDuration = createDuration(beginCC, now());
-	printMetricCalculationTime(CCDuration, "Cyclomatic Complexity", logfile);
  	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
  	iprintln("Top 3 Methods CC: <take(3,cc[1])>");
  	printComplexity(cc, logfile);
+ 	Duration CCDuration = createDuration(beginCC, now());
+	printMetricCalculationTime(CCDuration, "Cyclomatic Complexity", logfile);
 	// end CC
  	
  	

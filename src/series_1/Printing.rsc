@@ -38,7 +38,7 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 	appendToFile(logfile, "Total LOC: <totalLinesOfCode>\</br\>");
 	appendToFile(logfile, "Total Blank lines: <totalBlankLines>\</br\>");
 	appendToFile(logfile, "Total Comments: <totalComments>\</br\>");
-	appendToFile(logfile, "The Lines of Code for this project was rated \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>");
+	appendToFile(logfile, "The Lines of Code for this project was rated \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>\</br\>");
 	
 }
 
@@ -72,7 +72,7 @@ public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile
 	
 	appendToFile(logfile, "\<h2\>Unit Size for project\</h2\>");
 	
-	appendToFile(logfile, "The unit size for this project was rated \<strong\><unitsizes[0]>\</strong\>");
+	appendToFile(logfile, "The unit size for this project was rated \<strong\><unitsizes[0]>\</strong\>\</br\>");
 	
 }
 
@@ -99,7 +99,7 @@ public void printComplexity(tuple[int,lrel[str,int,int]] cc, loc logfile) {
 		appendToFile(logfile, "Results lower than 5 CC ommitted");
 		
 	}
-	appendToFile(logfile, "\</tbody\>\</table\>");
+	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
 	
 	
 }
@@ -119,13 +119,13 @@ public void printDuplication(tuple [real, int] duplicates, loc logfile) {
 }
 
 public void printExecutionTime(Duration duration, loc logfile) {
-	durationStr = "Calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	durationStr = "Calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.\</br\>";
 	iprintln(durationStr);
 	appendToFile(logfile, durationStr);
 }
 
 public void printMetricCalculationTime(Duration duration, str metric, loc logfile) {
-	durationStr = "Calculations for <metric> were completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	durationStr = "Calculations for <metric> were completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.\</br\>";
 	iprintln(durationStr);
 	appendToFile(logfile, durationStr);
 }
