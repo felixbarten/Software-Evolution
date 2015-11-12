@@ -25,7 +25,12 @@ public void setup(loc project, bool debug, loc logfile) {
 	// start LOC
 	datetime beginLOC = now();
 	println("Starting LOC calculation");
+	int classesSize = size(classes(myModel));
+	int counter = 0;
 	for (class <- classes(myModel)) {
+		if (counter % 100 == 0) 
+			println("Calculated LOC for <counter> out of <classesSize> classes");
+		counter += 1; 
 		list[loc] units = [c | c <- invert(myModel@containment)[class], c.scheme == "java+compilationUnit"];
 		for (loc unit <- units){
 			if (debug) 
@@ -46,8 +51,8 @@ public void setup(loc project, bool debug, loc logfile) {
 	iprintln("Total Blank lines: <totalBlankLines>");
 	iprintln("Total Comments: <totalComments>");
 	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
- 	Duration CCDuration = createDuration(beginLOC, now());
-	printMetricCalculationTime(executionTime, "Lines Of Code", logfile);	
+ 	Duration LOCDuration = createDuration(beginLOC, now());
+	printMetricCalculationTime(LOCDuration, "Lines Of Code", logfile);	
  	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
 	printLOC(containmentLocs, logfile);
 	// end LOC
@@ -57,25 +62,25 @@ public void setup(loc project, bool debug, loc logfile) {
 	println("Starting Unit Size calculation");
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
-	Duration CCDuration = createDuration(beginUnitSize, now());
-	printMetricCalculationTime(executionTime, "Unit Size", logfile);
+	Duration UnitSizeDuration = createDuration(beginUnitSize, now());
+	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
  	iprintln("Unit Size Category for project: <unitsizes[0]>");
  	printUnitSize(unitsizes, logfile);
-	// end Unit Size
+	//end Unit Size
 
-	/*
+	
 	//start Duplication
 	datetime beginDuplication = now();
 	println("Starting Code duplication");
  	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
  	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
- 	Duration CCDuration = createDuration(beginDuplication, now());
-	printMetricCalculationTime(executionTime, "Duplication", logfile);
+ 	Duration DupDuration = createDuration(beginDuplication, now());
+	printMetricCalculationTime(DupDuration, "Duplication", logfile);
  	iprintln("Code Duplication Category: <scoreDup>");
  	printDuplication(duplicates, logfile);
  	// end Duplication
- 	*/
+ 	
  	
  	// start CC
  	datetime beginCC = now();
@@ -84,7 +89,7 @@ public void setup(loc project, bool debug, loc logfile) {
     cc =  calcCCScore(myModel, totalLinesOfCode);
     scoreCC = printVerdict(cc[0]);
     Duration CCDuration = createDuration(beginCC, now());
-	printMetricCalculationTime(executionTime, "Cyclomatic Complexity", logfile);
+	printMetricCalculationTime(CCDuration, "Cyclomatic Complexity", logfile);
  	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
  	iprintln("Top 3 Methods CC: <take(3,cc[1])>");
  	printComplexity(cc, logfile);
@@ -98,9 +103,9 @@ public void setup(loc project, bool debug, loc logfile) {
 public void getMetrics(bool debug){
 	value begintime = now();
 	// Don't run on hsqldb right now
-	list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
+	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
 
-	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
+	list[loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 //	list[loc] projects = [|project://testJava|];
@@ -112,8 +117,7 @@ public void getMetrics(bool debug){
 		println("Analyzing project <project>");
 		setup(project, debug, logfile);
 	}
-	value endtime = now();
-	Duration executionTime = createDuration(begintime,endtime);
+	Duration executionTime = createDuration(begintime, now());
 	printExecutionTime(executionTime, logfile);
 	endReport(logfile);
 	

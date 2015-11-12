@@ -1,9 +1,9 @@
 module series_1::Printing
 
 import Prelude;
+import series_1::Duplication;
 import series_1::LOC;
 import series_1::Scoring;
-import series_1::Duplication;
 import series_1::Util;
 
 public loc startReport() {

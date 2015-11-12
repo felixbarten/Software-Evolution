@@ -3,6 +3,7 @@ module series_1::Duplication
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
+import util::Math;
 import series_1::LOC;
 import Prelude;
 
@@ -14,13 +15,24 @@ public tuple[ real, int] getDuplicates(M3 model, rel [str, int, int] unitsizes, 
 
 	int duplicates = 0;
 	int classesSize = size(classes(model));
+	int divider = round(classesSize / 20.0);
 	int counter = 0;
+	real percentage = 0.0;
+	if (divider == 0) {
+		divider = 1; 
+	}
 
 	for (class <- classes(model)) {
-		if (counter % 100 == 0) {
-			println("Checked <counter> out of <classesSize> classes for duplication");
-		}
+		if (counter % divider == 0) {
+			if (counter == 0) 
+				percentage = 4.0;
+			else 
+				percentage = (toReal(counter) / toReal(classesSize)) * 100.0;
+			println("Duplication calculations on: <percentage>%");
+		} 
 		counter += 1;
+		if (counter == classesSize) 
+			println("Duplication calculations on: 100.0%");
 		if (getLOC(class, debug)[0] < 6) continue;
 		
 		list[str] srcLines = [];

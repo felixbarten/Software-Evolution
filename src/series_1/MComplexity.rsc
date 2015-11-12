@@ -41,7 +41,8 @@ public list[tuple[str,int,int]] calcProjectCC(M3 input){
 	 model = input;
 	int counter = 0;
 	int methodSize = size(methods(model)); 
-	 return for(m <- methods(model)){
+	
+	return for(m <- methods(model)){
 	 	if (counter % 100 == 0) {
 	 		println("Calculated complexity for <counter> out of <methodSize> methods");
 	 	}
