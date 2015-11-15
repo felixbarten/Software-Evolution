@@ -7,7 +7,7 @@ import lang::java::jdt::m3::AST;
 import series_1::LOC;
 import series_1::Scoring;
 
-public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC, bool debug) {
+public tuple [int, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC, bool debug) {
 	rel[str, int, int] unitSizes = {};
 	int moderate = 0;
 	int high = 0;
@@ -34,18 +34,18 @@ public tuple [str, rel[str, int, int]] getUnitsSize(M3 project, int totalLOC, bo
 	real percentageHigh = high/totalLOC*100.0;
 	real percentageVeryHigh = vhigh/totalLOC*100.0;
 	real percentageSimple = simple/totalLOC*100.0;
-	str unitSizeCategory = "";
+	int unitSizeCategory = 1;
 	
 	if (percentageModerate <= 25 && percentageHigh == 0 && percentageVeryHigh == 0) {
-		unitSizeCategory = "++";
+		unitSizeCategory = 5;
 	} else if (percentageModerate > 25 && percentageModerate <= 30 && percentageHigh <= 5 && percentageVeryHigh == 0) {
-		unitSizeCategory = "+";
+		unitSizeCategory = 4;
 	} else if (percentageModerate > 30 && percentageModerate <= 40 && percentageHigh <= 10 && percentageVeryHigh == 0) {
-		unitSizeCategory = "0";
+		unitSizeCategory = 3;
 	} else if (percentageModerate > 40 && percentageModerate <= 50 && percentageHigh <= 15 && percentageVeryHigh <= 5) {
-		unitSizeCategory = "-";
+		unitSizeCategory = 2;
 	} else if (percentageModerate > 50 || percentageHigh > 15 || percentageVeryHigh > 5){
-		unitSizeCategory = "--";
+		unitSizeCategory = 1;
 	}
 	if(debug){
 		prettyPrintUnitSize(unitSizes); 

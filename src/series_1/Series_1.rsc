@@ -11,6 +11,7 @@ import Prelude;
 import series_1::Scoring;
 import series_1::Util;
 import series_1::Printing;
+import series_1::TestCoverage;
 import Set;
 import DateTime;
 
@@ -50,19 +51,23 @@ public void setup(loc project, bool debug, loc logfile) {
 	iprintln("Total LOC: <totalLinesOfCode>");
 	iprintln("Total Blank lines: <totalBlankLines>");
 	iprintln("Total Comments: <totalComments>");
-	scoreV = printVerdict(calcLOCScore(totalLinesOfCode));
+	v = calcLOCScore(totalLinesOfCode);
+	scoreV = printVerdict(v);
 	printLOC(containmentLocs, logfile);
  	Duration LOCDuration = createDuration(beginLOC, now());
 	printMetricCalculationTime(LOCDuration, "Lines Of Code", logfile);	
+	println("");
  	iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
 	// end LOC
 	
 	// start Unit Size
 	datetime beginUnitSize = now();
+	println("");
 	println("Starting Unit Size calculation");
 	// calculate unit size
 	unitsizes = getUnitsSize(myModel, totalLinesOfCode, debug);
- 	iprintln("Unit Size Category for project: <unitsizes[0]>");
+	scoreU = printVerdict(unitsizes[0]);
+ 	iprintln("Unit Size Category for project: <scoreU>");
  	printUnitSize(unitsizes, logfile);
  	Duration UnitSizeDuration = createDuration(beginUnitSize, now());
 	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
@@ -71,12 +76,15 @@ public void setup(loc project, bool debug, loc logfile) {
 	
 	//start Duplication
 	datetime beginDuplication = now();
+	println("");
 	println("Starting Code duplication");
  	// Calculate Code Duplication	
  	duplicates = getDuplicates(myModel, unitsizes[1], debug, totalLinesOfCode);
- 	scoreDup = printVerdict(calcDuplicationScore(duplicates[0]));
+ 	d = calcDuplicationScore(duplicates[0]);
+ 	scoreDup = printVerdict(d);
  	printDuplication(duplicates, logfile);
  	Duration DupDuration = createDuration(beginDuplication, now());
+	println("");
  	iprintln("Code Duplication Category: <scoreDup>");
 	printMetricCalculationTime(DupDuration, "Duplication", logfile);
  	// end Duplication
@@ -84,6 +92,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	
  	// start CC
  	datetime beginCC = now();
+	println("");
  	println("Starting Cyclomatic Complexity");
  	//Calcute Mcabe CC
     cc =  calcCCScore(myModel, totalLinesOfCode);
@@ -94,8 +103,36 @@ public void setup(loc project, bool debug, loc logfile) {
  	Duration CCDuration = createDuration(beginCC, now());
 	printMetricCalculationTime(CCDuration, "Cyclomatic Complexity", logfile);
 	// end CC
+	
+	//Calc TestCoverage
+	datetime beginTC = now();	
+	println("");
+ 	println("Starting Test Coverage");
+ 	tc = calcTestCoverage(myModel, totalLinesOfCode);
+ 	tcs = calcTestCoverageScore(tc);
+ 	scoreTC = printVerdict(tcs);
+ 	iprintln("Test Coverage Category: <tc>%(<scoreTC>)");
+ 	Duration TCDuration = createDuration(beginTC, now());
+	printMetricCalculationTime(TCDuration, "Test Coverage", logfile);
+	//end testcoverage
  	
  	
+ 	//MaintainabilityScore
+	println("");
+ 	println("MaintainabilityScore:");
+	println("");
+ 	analysability = calcAnalysability(v,d,unitsizes[0],tcs); 	
+ 	iprintln("Analysability: <printVerdict(analysability)>");
+ 	changeability = calcChangeability(cc[0],d); 	
+ 	iprintln("Changeability: <printVerdict(changeability)>");
+ 	stability = calcStability(tcs);
+ 	iprintln("Stability: <printVerdict(stability)>");
+ 	testability = calcTestability(cc[0],d, tcs);
+ 	iprintln("Testability: <printVerdict(testability)>");
+	println("");
+ 	//end maintainabilitScores
+	 	
+
  	Duration executionTime = createDuration(begintime, now());
 	printExecutionTime(executionTime, logfile);
 }

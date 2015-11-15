@@ -42,7 +42,7 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 	
 }
 
-public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile) {
+public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile) {
 	appendToFile(logfile, "\<h2\>Unit Size per method\</h2\>");
 	
 	//appendToFile(logfile, "\<div class=\".table-responsive\"\>");
@@ -72,11 +72,11 @@ public void printUnitSize(tuple [str, rel[str, int, int]] unitsizes, loc logfile
 	
 	appendToFile(logfile, "\<h2\>Unit Size for project\</h2\>");
 	
-	appendToFile(logfile, "The unit size for this project was rated \<strong\><unitsizes[0]>\</strong\>\</br\>");
+	appendToFile(logfile, "The unit size for this project was rated \<strong\><printVerdict(unitsizes[0])>\</strong\>\</br\>");
 	
 }
 
-public void printComplexity(tuple[int,lrel[str,int,int]] cc, loc logfile) {
+public void printComplexity(tuple[int,lrel[loc,int,int]] cc, loc logfile) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	

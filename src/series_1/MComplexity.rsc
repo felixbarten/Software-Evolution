@@ -37,8 +37,8 @@ test bool t1(){
 	return result[0] == 5;
 }
 
-public list[tuple[str,int,int]] calcProjectCC(M3 input){
-	 model = input;
+public list[tuple[loc,int,int]] calcProjectCC(M3 input){
+	model = input;
 	int counter = 0;
 	int methodSize = size(methods(model)); 
 	
@@ -48,7 +48,7 @@ public list[tuple[str,int,int]] calcProjectCC(M3 input){
 	 	}
 	 	counter += 1;
 	 	methodAST = getMethodASTEclipse(m,model=model);
-	 	append <m.path, getLOC(m, false)[0], calcMethodCC(methodAST)>;
+	 	append <m, getLOC(m, false)[0], calcMethodCC(methodAST)>;
 	 }
 }
 
@@ -61,7 +61,7 @@ public list[tuple[str,int,int]] calcProjectCC(M3 input){
 		<30, 5,0>
 		<25, 0,0>
 */
-public tuple [ int, lrel[ str, int, int] ] calcCCScore( M3 model,totalLoc){
+public tuple [ int, lrel[ loc, int, int] ] calcCCScore( M3 model,totalLoc){
 
 	int low = 0;
 	int moderate = 0;
@@ -110,5 +110,5 @@ public tuple [ int, lrel[ str, int, int] ] calcCCScore( M3 model,totalLoc){
 		result = 5;	
 	}
 		
-    return <result, sort(methodCCs, bool(tuple[str,int,int] a, tuple[str,int,int] b){ return a[2] > b[2]; })>;
+    return <result, sort(methodCCs, bool(tuple[loc,int,int] a, tuple[loc,int,int] b){ return a[2] > b[2]; })>;
 }

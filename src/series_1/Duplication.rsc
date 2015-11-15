@@ -28,7 +28,7 @@ public tuple[ real, int] getDuplicates(M3 model, rel [str, int, int] unitsizes, 
 				percentage = 4.0;
 			else 
 				percentage = (toReal(counter) / toReal(classesSize)) * 100.0;
-			println("Duplication calculations on: <percentage>%");
+			println("Duplication calculation progress: <round(percentage,0.1)>%");
 		} 
 		counter += 1;
 		if (counter == classesSize) 

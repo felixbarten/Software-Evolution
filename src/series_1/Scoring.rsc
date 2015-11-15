@@ -19,12 +19,12 @@ public str printVerdict(int verdict) {
 	return strVerdict;
 }
 
-public str calcAnalysability(int v, int d, int u, int t){ return (v + d + u + t)/4;}
+public int calcAnalysability(int v, int d, int u, int t) =  (v + d + u + t)/4;
 
-public str calcChangeability(int c, int d){ return (c+d)/2.0;}
+public int calcChangeability(int c, int d)= (c+d)/2;
 
-public str calcStability(int t){ return t;}
+public int calcStability(int t) = t;
 
-public str calcTestability(int c, int d, int t){ return (c+d+t)/3; }
+public int calcTestability(int c, int d, int t)= (c+d+t)/3; 
 
 
