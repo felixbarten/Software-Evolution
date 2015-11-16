@@ -12,8 +12,10 @@ import series_1::Scoring;
 import series_1::Util;
 import series_1::Printing;
 import series_1::TestCoverage;
+import analysis::statistics::Descriptive;
 import Set;
 import DateTime;
+import util::Math;
 
 public void setup(loc project, bool debug, loc logfile) {
 	datetime begintime = now();
@@ -122,7 +124,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	
  	//MaintainabilityScore
 	println("");
- 	println("MaintainabilityScore:");
+ 	println("Maintainability Score:");
 	println("");
  	analysability = calcAnalysability(volScore,dupScore,unitsizes[0],tcs); 	
  	iprintln("Analysability: <printVerdict(analysability)>");
@@ -134,6 +136,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	iprintln("Testability: <printVerdict(testability)>");
  	printMaintainability(analysability, changeability, stability, testability, logfile);
 	println("");
+	println("Overall score: <printVerdict(toInt(median([analysability, changeability, stability, testability])))>");
  	//end maintainabilitScores
 	 	
 

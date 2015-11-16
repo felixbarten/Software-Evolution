@@ -28,21 +28,20 @@ public real calcTestCoverage(M3 model,int totalLoc){
 
 	allMethods = {<methodName(m.path),m> | m <- methods(model)};
 
-	while(calls != tr(allMethods,model, calls)){
-		calls += tr(allMethods,model, calls);
+	while(calls != findCalledMethodNames(allMethods, model, calls)){
+		calls += findCalledMethodNames(allMethods, model, calls);
 	}
 	
-	tmp = { r | <e,r> <- allMethods, e in calls}; 
-
+	tmp = { r | <e,r> <- allMethods, r in calls}; 
 	testLoc = (0 | it + getLOC(e,false)[0] * 1.0 | loc e <- tmp);
 	real coverage = testLoc/totalLoc * 100.0;
 	
 	return round(coverage,0.1);
 }
 
-private set[str] tr(allMethods,model,calls){
+private set[loc] findCalledMethodNames(allMethods,model,calls){
 	result = calls;
-	tmp = { r | <e,r> <- allMethods, e in result}; 
+	tmp = { r | <e,r> <- allMethods}; 
 	calledMethods = {getMethodASTEclipse(i, model=model)| i <- tmp};
 	for(t <- calledMethods){
 		result += getMethodCalls(t);	
@@ -50,16 +49,17 @@ private set[str] tr(allMethods,model,calls){
 	return result;
 }
 
-private set[str] getMethodCalls(ast){
+private set[loc] getMethodCalls(ast){
 
-	set[str] calls = {};	
-
+	set[loc] calls = {};	
 	visit(ast){
-		case \methodCall(_,n,_):{
-			 calls += n;
-		 }	
-		case \methodCall(_,_,n,_):{
-			 calls += n;	
+		case a:\methodCall(_,n,_):{
+			try calls += a@decl;
+			catch:;
+		 }
+		case b:\methodCall(_,_,n,_):{
+			try calls += b@decl;
+			catch:;	
 		}
 	}		
 

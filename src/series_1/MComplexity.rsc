@@ -32,7 +32,6 @@ public int calcMethodCC(methodAST){
 	}
 
 	i = i + numberOfReturns;
-
 	return i;
 } 
 
