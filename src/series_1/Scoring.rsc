@@ -1,4 +1,7 @@
 module series_1::Scoring
+import analysis::statistics::Descriptive;
+import List;
+import util::Math;
 
 public str printVerdict(int verdict) {
 	str strVerdict = "";
@@ -19,12 +22,21 @@ public str printVerdict(int verdict) {
 	return strVerdict;
 }
 
-public int calcAnalysability(int volume, int duplicates, int unitsizes, int testcoverage) =  (volume + duplicates + unitsizes + testcoverage)/4;
+public int calcAnalysability(int volume, int duplicates, int unitsizes, int testcoverage) {  
+	list[int] scores = sort([volume,duplicates,unitsizes,testcoverage]);
+	return toInt(median(scores));
+}
 
-public int calcChangeability(int complexity, int duplicates)= (complexity + duplicates)/2;
+public int calcChangeability(int complexity, int duplicates){ 
+	list[int] scores = sort([complexity,duplicates]);
+	return toInt(median(scores));
+}
 
 public int calcStability(int testcoverage) = testcoverage;
 
-public int calcTestability(int complexity, int duplicates, int testcoverage)= (complexity + duplicates + testcoverage)/3; 
+public int calcTestability(int complexity, int duplicates, int testcoverage){
+	list[int] scores = sort([complexity,duplicates, testcoverage]);
+	return toInt(median(scores));
+} 
 
 

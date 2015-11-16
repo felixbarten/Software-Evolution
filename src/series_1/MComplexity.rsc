@@ -12,25 +12,27 @@ public int calcMethodCC(methodAST){
 	int numberOfReturns = 0;
 
 	visit(methodAST){
-		case "if"(_, _) : i = i +1;
-		case "if"(_, _,_) : i = i +1;
-		case "do"(_, _,_) : i = i +1;
-		case "conditional"(_, _,_) : i = i +1;
-		case "while"(_, _) : i = i +1;
-		case "for"(_, _, _) : i = i +1;
-		case "for"(_, _, _, _) : i = i +1;
-		case "foreach"(_, _, _) : i = i +1;
-		case "try"(_, _) : i = i +1;
-		case "try"(_, _, _) : i = i +1;
-		case "case"(_) : i = i +1;
-		case "defaultCase"() : i = i +1;
-		case "infix"(_,"&&",_) : i = i +1;
-		case "infix"(_,"||",_) : i = i +1;
+		case "if"(_, _) : i +=1;
+		case "if"(_, _,_) : i += 1;
+		case "conditional"(_, _,_) : i +=1;
+		case "while"(_, _) : i += 1;
+		case "for"(_, _, _) : i += 1;
+		case "for"(_, _, _, _) : i +=1;
+		case "foreach"(_, _, _) : i +=1;
+		case "try"(_, _) : i += 1;
+		case "try"(_, _, _) : i += 1;
+		case "case"(_) : i += 1;
+		case "infix"(_,"&&",_) : i += 1;
+		case "infix"(_,"||",_) : i += 1;
+		case "try"(_, _): i += 1;
+		case "try"(_, _, _) : i += 1;                                       
+		case "catch"(_, _): i += 1;
         case "return"(_): numberOfReturns = numberOfReturns +1; 
         case "return"(): numberOfReturns = numberOfReturns +1; 
 	}
 
-	i = i + (numberOfReturns -1);
+	i = i + numberOfReturns;
+
 	return i;
 } 
 
