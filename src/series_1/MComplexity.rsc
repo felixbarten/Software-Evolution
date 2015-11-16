@@ -5,6 +5,7 @@ import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import Prelude;
 import series_1::LOC;
+import util::Math;
 
 public int calcMethodCC(methodAST){
 
@@ -90,10 +91,10 @@ public tuple [ int, lrel[ loc, int, int], tuple[int,int,int,int] ] calcCCScore( 
 	//println(high);
 	//println(veryHigh);
 
-	int pL = moderate/totalLoc*100;
-	int pM = moderate/totalLoc*100;
-	int pH = high/totalLoc*100;
-	int pV = veryHigh/totalLoc*100;
+	pL = toInt(low*1.0/totalLoc*100);
+	pM = toInt(moderate*1.0/totalLoc*100);
+	pH = toInt(high*1.0/totalLoc*100);
+	pV = toInt(veryHigh*1.0/totalLoc*100);
 
 	if( pM > 50 || pH > 15 || pV > 5 ){
 		result = 1;	
