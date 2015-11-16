@@ -113,7 +113,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	tc = calcTestCoverage(myModel, totalLinesOfCode);
  	tcs = calcTestCoverageScore(tc);
  	scoreTC = printVerdict(tcs);
- 	iprintln("Test Coverage Category: <tc>%(<scoreTC>)");
+ 	iprintln("Test Coverage Category: <tc>% (<scoreTC>)");
  	Duration TCDuration = createDuration(beginTC, now());
  	printTestCoverage(tcs, logfile);
 	printMetricCalculationTime(TCDuration, "Test Coverage", logfile);
@@ -138,7 +138,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	 	
 
  	Duration executionTime = createDuration(begintime, now());
-	printExecutionTime(executionTime, logfile);
+	printProjectExecutionTime(executionTime, logfile);
 }
 
 public void getMetrics(bool debug){
