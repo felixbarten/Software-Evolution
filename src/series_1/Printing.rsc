@@ -9,7 +9,7 @@ import analysis::statistics::Descriptive;
 import util::Math;
 
 
-public loc startReport() {
+public loc startReport(list[loc] projects) {
 	loc logfile = |project://Software-Evolution/reports/report.html|;
 	println("writing report");
 	// write or overrwrite file. 
@@ -18,8 +18,18 @@ public loc startReport() {
 	appendToFile(logfile, "\<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\"\>");
 	appendToFile(logfile, "\</header\>\<body\>");
 	appendToFile(logfile, "\<script src=\"js/bootstrap.min.js\"\>\</script\>");
-	appendToFile(logfile, "\<script src=\"js/nvd3.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<script src=\"js/d3.min.js\"\>\</script\>");
+	appendToFile(logfile, "\<script src=\"js/nvd3.min.js\"\>\</script\>");
+	appendToFile(logfile, "\<script\>var projects = {");
+	int sizeOf = size(projects) - 1;
+	for (project <- projects){
+		if (project == projects[sizeOf]) {
+			appendToFile(logfile, "\"<project.authority>\": []");
+		} else {
+			appendToFile(logfile, "\"<project.authority>\": [], ");
+		}
+	}
+	appendToFile(logfile, "};\</script\> ");
 	appendToFile(logfile, "\<div class=\"container\"\>");
 	appendToFile(logfile, "\<div class=\"row\"\>");
 
@@ -107,7 +117,7 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int,
 	// graphs
 	appendToFile(logfile, "\<div id=\"ccchart\"\>\<svg\>\</svg\>\</div\>");
 	appendToFile(logfile, "\<script\>var ccgraphdata = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
-	
+	println(cc[2]);
 	
 	
 }

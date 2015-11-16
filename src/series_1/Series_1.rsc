@@ -9,6 +9,7 @@ import series_1::Util;
 import series_1::Printing;
 import series_1::TestCoverage;
 import analysis::statistics::Descriptive;
+import Prelude;
 import Set;
 import DateTime;
 import util::Math;
@@ -25,7 +26,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	list[loc] parsed = [];
 	totalLOC = 0;
 	containmentLocs = ();
-	appendToFile(logfile, "\<h1\>Results for project: <project.path>\</h1\>");
+	appendToFile(logfile, "\<h1\>Results for project: <project.authority>\</h1\>");
 	
 	// start LOC
 	datetime beginLOC = now();
@@ -149,15 +150,15 @@ public void setup(loc project, bool debug, loc logfile) {
 public void getMetrics(bool debug){
 	value begintime = now();
 	// Don't run on hsqldb right now
-	 list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
+	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
 
-	//list [loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
+	list [loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 	//list[loc] projects = [|project://JavaTest|, |project://JavaTest2|];
 
 	println("Starting metrics analysis on <size(projects)> projects");
-	logfile = startReport();
+	logfile = startReport(projects);
 	
 	for (project <- projects) {
 		println("Analyzing project <project>");
