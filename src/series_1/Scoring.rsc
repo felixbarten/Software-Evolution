@@ -19,12 +19,12 @@ public str printVerdict(int verdict) {
 	return strVerdict;
 }
 
-public int calcAnalysability(int v, int d, int u, int t) =  (v + d + u + t)/4;
+public int calcAnalysability(int volume, int duplicates, int unitsizes, int testcoverage) =  (volume + duplicates + unitsizes + testcoverage)/4;
 
-public int calcChangeability(int c, int d)= (c+d)/2;
+public int calcChangeability(int complexity, int duplicates)= (complexity + duplicates)/2;
 
-public int calcStability(int t) = t;
+public int calcStability(int testcoverage) = testcoverage;
 
-public int calcTestability(int c, int d, int t)= (c+d+t)/3; 
+public int calcTestability(int complexity, int duplicates, int testcoverage)= (complexity + duplicates + testcoverage)/3; 
 
 
