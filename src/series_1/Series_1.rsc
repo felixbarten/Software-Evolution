@@ -115,6 +115,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	scoreTC = printVerdict(tcs);
  	iprintln("Test Coverage Category: <tc>%(<scoreTC>)");
  	Duration TCDuration = createDuration(beginTC, now());
+ 	printTestCoverage(tcs, logfile);
 	printMetricCalculationTime(TCDuration, "Test Coverage", logfile);
 	//end testcoverage
  	
@@ -131,6 +132,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	iprintln("Stability: <printVerdict(stability)>");
  	testability = calcTestability(cc[0], dupScore, tcs);
  	iprintln("Testability: <printVerdict(testability)>");
+ 	printMaintainability(analysability, changeability, stability, testability, logfile);
 	println("");
  	//end maintainabilitScores
 	 	
@@ -144,10 +146,10 @@ public void getMetrics(bool debug){
 	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
 
-	//list[loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
+	list[loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
-	list[loc] projects = [|project://JavaTest|, |project://JavaTest2|];
+	//list[loc] projects = [|project://JavaTest|, |project://JavaTest2|];
 
 	println("Starting metrics analysis on <size(projects)> projects");
 	logfile = startReport();

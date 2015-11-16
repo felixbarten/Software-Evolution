@@ -5,6 +5,9 @@ import series_1::Duplication;
 import series_1::LOC;
 import series_1::Scoring;
 import series_1::Util;
+import analysis::statistics::Descriptive;
+import util::Math;
+
 
 public loc startReport() {
 	loc logfile = |project://Software-Evolution/reports/report.html|;
@@ -38,7 +41,7 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 	appendToFile(logfile, "Total LOC: <totalLinesOfCode>\</br\>");
 	appendToFile(logfile, "Total Blank lines: <totalBlankLines>\</br\>");
 	appendToFile(logfile, "Total Comments: <totalComments>\</br\>");
-	appendToFile(logfile, "The Lines of Code for this project was rated \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>\</br\>");
+	appendToFile(logfile, "The Lines of Code for this project was rated: \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>\</br\>");
 	
 }
 
@@ -67,9 +70,7 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 		appendToFile(logfile, "Results lower than 20 LOC ommitted");
 		
 	}
-	appendToFile(logfile, "\</tbody\>\</table\>");
-	//appendToFile(logfile, "\</div\>");
-	
+	appendToFile(logfile, "\</tbody\>\</table\>");	
 	appendToFile(logfile, "\<h2\>Unit Size for project\</h2\>");
 	
 	appendToFile(logfile, "The unit size for this project was rated \<strong\><printVerdict(unitsizes[0])>\</strong\>\</br\>");
@@ -114,7 +115,7 @@ public void printDuplication(tuple [real, int] duplicates, loc logfile) {
 	appendToFile(logfile, "\<h2\>Clone Detection\</h2\>");
 	appendToFile(logfile, "There <verb> <duplicates[1]> duplicate <block> of code found in this project.\</br\>");
 	appendToFile(logfile, "The duplication percentage for this project is: <duplicates[0]>%\</br\>");
-	appendToFile(logfile, "The duplication score for this project is: <printVerdict(calcDuplicationScore(duplicates[0]))>\</br\>");
+	appendToFile(logfile, "The duplication score for this project was rated: <printVerdict(calcDuplicationScore(duplicates[0]))>\</br\>");
 
 }
 
@@ -129,3 +130,42 @@ public void printMetricCalculationTime(Duration duration, str metric, loc logfil
 	iprintln(durationStr);
 	appendToFile(logfile, durationStr);
 }
+
+public void printTestCoverage(tcscore, loc logfile) {
+	appendToFile(logfile, "\<h2\>Test Coverage\</h2\>");
+	appendToFile(logfile, "Test coverage for this project was rated: \<strong\><printVerdict(tcscore)>\</strong\>\</br\>");
+	
+}
+public void printMaintainability(int analysability, int changeability, int stability, int testability, loc logfile) {
+	appendToFile(logfile, "\<h2\>Maintainability\</h2\>");
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\</thead\>\<tbody\>");
+
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td\>Analyseability\</td\>");
+	appendToFile(logfile, "\<td\><printVerdict(analysability)>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td\>Changeability\</td\>");
+	appendToFile(logfile, "\<td\><printVerdict(changeability)>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td\>Stability\</td\>");
+	appendToFile(logfile, "\<td\><printVerdict(stability)>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td\>Testability\</td\>");
+	appendToFile(logfile, "\<td\><printVerdict(testability)>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td\>Overall Maintainability\</td\>");
+	appendToFile(logfile, "\<td\><printVerdict(toInt(median([analysability, changeability, stability, testability])))>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+
+	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
+
+}
+
