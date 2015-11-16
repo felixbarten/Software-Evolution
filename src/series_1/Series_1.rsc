@@ -1,13 +1,9 @@
 module series_1::Series_1
 
-import lang::java::m3::Core;
-import lang::java::jdt::m3::Core;
-import lang::java::jdt::m3::AST;
 import series_1::LOC;
 import series_1::MComplexity;
 import series_1::UnitSize;
 import series_1::Duplication;
-import Prelude;
 import series_1::Scoring;
 import series_1::Util;
 import series_1::Printing;
@@ -16,14 +12,20 @@ import analysis::statistics::Descriptive;
 import Set;
 import DateTime;
 import util::Math;
+import lang::java::m3::Core;
+import lang::java::jdt::m3::Core;
+import lang::java::jdt::m3::AST;
 
 public void setup(loc project, bool debug, loc logfile) {
 	datetime begintime = now();
+	datetime modelTime = now();
 	myModel = createM3FromEclipseProject(project);
+	Duration modelDuration = createDuration(modelTime, now());
+	printMetricCalculationTime(modelDuration, "M3 Model Creation", logfile);
 	list[loc] parsed = [];
 	totalLOC = 0;
 	containmentLocs = ();
-	appendToFile(logfile, "\<h1\>Results for project: <project>\</h1\>");
+	appendToFile(logfile, "\<h1\>Results for project: <project.path>\</h1\>");
 	
 	// start LOC
 	datetime beginLOC = now();
@@ -147,9 +149,9 @@ public void setup(loc project, bool debug, loc logfile) {
 public void getMetrics(bool debug){
 	value begintime = now();
 	// Don't run on hsqldb right now
-	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
+	 list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
 
-	list[loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
+	//list [loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];
 //	list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|, |project://smallsql0.21_src|];
 	//list[loc] projects = [|project://JavaTest|, |project://JavaTest2|];
