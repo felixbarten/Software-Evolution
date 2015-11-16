@@ -79,7 +79,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
 	//end Unit Size
 
-	/*
+	
 	//start Duplication
 	datetime beginDuplication = now();
 	println("");
@@ -94,7 +94,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	iprintln("Code Duplication Category: <scoreDup>");
 	printMetricCalculationTime(DupDuration, "Duplication", logfile);
  	// end Duplication
- 	*/
+ 	
  	
  	// start CC
  	datetime beginCC = now();
@@ -107,7 +107,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	iprintln("Top 3 Methods CC: <take(3,cc[1])>");
  	
  	iprintln("Total Complexity for project: <(0 | it + i[2] | i <- cc[1])>");
- 	printComplexity(cc, logfile);
+ 	printComplexity(cc, logfile, project);
  	Duration CCDuration = createDuration(beginCC, now());
 	printMetricCalculationTime(CCDuration, "Cyclomatic Complexity", logfile);
 	// end CC
@@ -142,7 +142,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	println("");
 	println("Overall score: <printVerdict(toInt(median([analysability, changeability, stability, testability])))>");
  	//end maintainabilitScores
-	 	
+	printEndProject(logfile, project);
 
  	Duration executionTime = createDuration(begintime, now());
 	printProjectExecutionTime(executionTime, logfile);
@@ -152,6 +152,8 @@ public void getMetrics(bool debug){
 	value begintime = now();
 	// Don't run on hsqldb right now
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
+	//list [loc] projects = [|project://smallsql0.21_src|];
+	//list [loc] projects = [|project://JavaTest2|];
 
 	list [loc] projects = [|project://smallsql0.21_src|, |project://JavaTest|, |project://JavaTest2|];
 	//list[loc] projects = [|project://RascalTestProject|, |project://JavaTest2|];

@@ -23,13 +23,16 @@ public loc startReport(list[loc] projects) {
 	appendToFile(logfile, "\<script\>var projects = {");
 	int sizeOf = size(projects) - 1;
 	for (project <- projects){
+		str projectname = project.authority;
+		projectname = replaceAll(projectname, ".", "_");
 		if (project == projects[sizeOf]) {
-			appendToFile(logfile, "\"<project.authority>\": []");
+			appendToFile(logfile, "\"<projectname>\": {\"cc\": [], \"cc1\": [], \"loc\": []}");
 		} else {
-			appendToFile(logfile, "\"<project.authority>\": [], ");
+			appendToFile(logfile, "\"<projectname>\": {\"cc\": [], \"cc1\": [], \"loc\": []}, ");
 		}
 	}
 	appendToFile(logfile, "};\</script\> ");
+	appendToFile(logfile, "\<script src=\"js/graphs.js\"\>\</script\>");
 	appendToFile(logfile, "\<div class=\"container\"\>");
 	appendToFile(logfile, "\<div class=\"row\"\>");
 
@@ -89,7 +92,7 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 	
 }
 
-public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int, int]] cc, loc logfile) {
+public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int, int]] cc, loc logfile, loc project) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	
@@ -115,11 +118,15 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int,
 	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
 	
 	// graphs
-	appendToFile(logfile, "\<div id=\"ccchart\"\>\<svg\>\</svg\>\</div\>");
-	appendToFile(logfile, "\<script\>var ccgraphdata = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
+	appendToFile(logfile, "\<div id=\"<printProjectID(project)>cc\"\>\<svg\>\</svg\>\</div\>");
+	appendToFile(logfile, "\<script\>projects[first(projects)][\"cc\"] = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
 	println(cc[2]);
 	
 	
+}
+
+public str printProjectID(loc project){
+	return replaceAll(project.authority, ".","_");
 }
 
 public void printDuplication(tuple [real, int] duplicates, loc logfile) {
@@ -196,5 +203,8 @@ public void printMaintainability(int analysability, int changeability, int stabi
 
 	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
 
+}
+public void printEndProject(loc logfile, loc project) {
+	appendToFile(logfile, "\<script\>delete projects[\"<printProjectID(project)>\"]\</script\>");
 }
 
