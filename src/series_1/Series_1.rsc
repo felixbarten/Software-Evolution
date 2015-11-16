@@ -16,6 +16,7 @@ import util::Math;
 import lang::java::m3::Core;
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
+import Prelude;
 
 public void setup(loc project, bool debug, loc logfile) {
 	datetime begintime = now();
