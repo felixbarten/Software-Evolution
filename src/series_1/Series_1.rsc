@@ -77,7 +77,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	printMetricCalculationTime(UnitSizeDuration, "Unit Size", logfile);
 	//end Unit Size
 
-	
+	/*
 	//start Duplication
 	datetime beginDuplication = now();
 	println("");
@@ -92,7 +92,7 @@ public void setup(loc project, bool debug, loc logfile) {
  	iprintln("Code Duplication Category: <scoreDup>");
 	printMetricCalculationTime(DupDuration, "Duplication", logfile);
  	// end Duplication
- 	
+ 	*/
  	
  	// start CC
  	datetime beginCC = now();

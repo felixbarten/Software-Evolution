@@ -18,6 +18,8 @@ public loc startReport() {
 	appendToFile(logfile, "\<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\"\>");
 	appendToFile(logfile, "\</header\>\<body\>");
 	appendToFile(logfile, "\<script src=\"js/bootstrap.min.js\"\>\</script\>");
+	appendToFile(logfile, "\<script src=\"js/nvd3.min.js\"\>\</script\>");
+	appendToFile(logfile, "\<script src=\"js/d3.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<div class=\"container\"\>");
 	appendToFile(logfile, "\<div class=\"row\"\>");
 
@@ -77,7 +79,7 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 	
 }
 
-public void printComplexity(tuple[int,lrel[loc,int,int]] cc, loc logfile) {
+public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int, int]] cc, loc logfile) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	
@@ -101,6 +103,11 @@ public void printComplexity(tuple[int,lrel[loc,int,int]] cc, loc logfile) {
 		
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
+	
+	// graphs
+	appendToFile(logfile, "\<div id=\"ccchart\"\>\<svg\>\</svg\>\</div\>");
+	appendToFile(logfile, "\<script\>var ccgraphdata = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
+	
 	
 	
 }

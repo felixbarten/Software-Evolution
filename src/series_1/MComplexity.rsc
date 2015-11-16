@@ -66,7 +66,7 @@ public list[tuple[loc,int,int]] calcProjectCC(M3 input){
 		<30, 5,0>
 		<25, 0,0>
 */
-public tuple [ int, lrel[ loc, int, int] ] calcCCScore( M3 model,totalLoc){
+public tuple [ int, lrel[ loc, int, int], tuple[int,int,int,int] ] calcCCScore( M3 model,totalLoc){
 
 	int low = 0;
 	int moderate = 0;
@@ -98,7 +98,7 @@ public tuple [ int, lrel[ loc, int, int] ] calcCCScore( M3 model,totalLoc){
 	//println(high);
 	//println(veryHigh);
 
-	
+	int pL = moderate/totalLoc*100;
 	int pM = moderate/totalLoc*100;
 	int pH = high/totalLoc*100;
 	int pV = veryHigh/totalLoc*100;
@@ -115,5 +115,5 @@ public tuple [ int, lrel[ loc, int, int] ] calcCCScore( M3 model,totalLoc){
 		result = 5;	
 	}
 		
-    return <result, sort(methodCCs, bool(tuple[loc,int,int] a, tuple[loc,int,int] b){ return a[2] > b[2]; })>;
+    return <result, sort(methodCCs, bool(tuple[loc,int,int] a, tuple[loc,int,int] b){ return a[2] > b[2]; }), <pL, pM, pH, pV>>;
 }
