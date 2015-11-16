@@ -32,7 +32,6 @@ public loc startReport(list[loc] projects) {
 		}
 	}
 	appendToFile(logfile, "};\</script\> ");
-	appendToFile(logfile, "\<script src=\"js/graphs.js\"\>\</script\>");
 	appendToFile(logfile, "\<div class=\"container\"\>");
 	appendToFile(logfile, "\<div class=\"row\"\>");
 
@@ -41,6 +40,8 @@ public loc startReport(list[loc] projects) {
 }
 
 public void endReport(loc file) {
+	appendToFile(file, "\<script src=\"js/graphs.js\"\>\</script\>");
+
 	appendToFile(file, "\</div\>");
 	appendToFile(file, "\</body\>\n\</html\>");
 }
@@ -119,7 +120,9 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int,
 	
 	// graphs
 	appendToFile(logfile, "\<div id=\"<printProjectID(project)>cc\"\>\<svg\>\</svg\>\</div\>");
-	appendToFile(logfile, "\<script\>projects[first(projects)][\"cc\"] = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
+	//appendToFile(logfile, "\<script\>projects[\"<printProjectID(project)>\"][\"cc\"] = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
+	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.cc = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
+	
 	println(cc[2]);
 	
 	
@@ -205,6 +208,6 @@ public void printMaintainability(int analysability, int changeability, int stabi
 
 }
 public void printEndProject(loc logfile, loc project) {
-	appendToFile(logfile, "\<script\>delete projects[\"<printProjectID(project)>\"]\</script\>");
+	//appendToFile(logfile, "\<script\>delete projects.<printProjectID(project)>\</script\>");
 }
 

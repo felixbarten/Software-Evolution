@@ -1,7 +1,7 @@
 for (var project in projects) {
-	var data = projects[project];
+	//var data = projects[project];
 	console.log(project);
-	console.log(data);	// returned object in screenshot
+	//console.log(data);	// returned object in screenshot
 
 	//Regular pie chart example
 	nv.addGraph(function() {
@@ -13,7 +13,7 @@ for (var project in projects) {
 		var selectorStr = "#" + project + "cc" + " svg";
 		console.log(selectorStr);
 	    d3.select(selectorStr)
-	        .datum(data.cc)
+	        .datum(projects[project].cc)
 	        .transition().duration(350)
 	        .call(chart);
 	
