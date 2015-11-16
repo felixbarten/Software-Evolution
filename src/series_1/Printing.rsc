@@ -115,19 +115,31 @@ public void printDuplication(tuple [real, int] duplicates, loc logfile) {
 	appendToFile(logfile, "\<h2\>Clone Detection\</h2\>");
 	appendToFile(logfile, "There <verb> <duplicates[1]> duplicate <block> of code found in this project.\</br\>");
 	appendToFile(logfile, "The duplication percentage for this project is: <duplicates[0]>%\</br\>");
-	appendToFile(logfile, "The duplication score for this project was rated: <printVerdict(calcDuplicationScore(duplicates[0]))>\</br\>");
+	appendToFile(logfile, "The duplication score for this project was rated: \<strong\><printVerdict(calcDuplicationScore(duplicates[0]))>\</strong\>\</br\>");
 
 }
 
 public void printExecutionTime(Duration duration, loc logfile) {
-	durationStr = "Calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.\</br\>";
+	newline = "\</br\>";
+	durationStr = "Total calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
 	iprintln(durationStr);
+	durationStr += newline;
+	appendToFile(logfile, durationStr);
+}
+
+public void printProjectExecutionTime(Duration duration, loc logfile) {
+	newline = "\</br\>";
+	durationStr = "Calculations for project completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	iprintln(durationStr);
+	durationStr += newline;
 	appendToFile(logfile, durationStr);
 }
 
 public void printMetricCalculationTime(Duration duration, str metric, loc logfile) {
-	durationStr = "Calculations for <metric> were completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.\</br\>";
+	newline = "\</br\>";
+	durationStr = "Calculations for <metric> were completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
 	iprintln(durationStr);
+	durationStr += newline;
 	appendToFile(logfile, durationStr);
 }
 
