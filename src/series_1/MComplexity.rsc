@@ -9,23 +9,28 @@ import series_1::LOC;
 public int calcMethodCC(methodAST){
 
 	int i = 1;
+	int numberOfReturns = 0;
 
 	visit(methodAST){
-		case "if"(_, _) : i = i +1;
-		case "if"(_, _,_) : i = i +1;
-		case "do"(_, _,_) : i = i +1;
-		case "conditional"(_, _,_) : i = i +1;
-		case "while"(_, _) : i = i +1;
-		case "for"(_, _, _) : i = i +1;
-		case "for"(_, _, _, _) : i = i +1;
-		case "foreach"(_, _, _) : i = i +1;
-		case "try"(_, _) : i = i +1;
-		case "try"(_, _, _) : i = i +1;
-		case "case"(_) : i = i +1;
-		case "defaultCase"() : i = i +1;
-		case "infix"(_,"&&",_) : i = i +1;
-		case "infix"(_,"||",_) : i = i +1;
+		case "if"(_, _) : i++;
+		case "if"(_, _,_) : i++;
+		case "do"(_, _,_) : i++;
+		case "conditional"(_, _,_) : i++;
+		case "while"(_, _) : i++;
+		case "for"(_, _, _) : i++;
+		case "for"(_, _, _, _) : i++;
+		case "foreach"(_, _, _) : i++;
+		case "try"(_, _) : i++;
+		case "try"(_, _, _) : i++;
+		case "case"(_) : i++;
+		case "defaultCase"() : i++;
+		case "infix"(_,"&&",_) : i++;
+		case "infix"(_,"||",_) : i++;
+        case "return"(_): numberOfReturns++; 
+        case "return"(): numberOfReturns++; 
 	}
+
+	i = i + (numberOfReturns -1);
 
 	return i;
 } 
