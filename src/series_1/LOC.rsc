@@ -101,3 +101,29 @@ public int calcLOCScore(int LOCs){
 	}
  	return result;
 }
+test bool aNoComment(){
+	 loc fileLocation = |project://testJava/src/testJava/A.java|;
+	 fileLines = readFileLines(fileLocation);
+	 return size(fileLines) == getLOC(fileLocation, false)[0];
+}
+
+test bool a2WithComment(){
+	 loc fileLocation = |project://testJava/src/testJava/A2.java|;
+	 fileLines = readFileLines(fileLocation);
+	 return size(fileLines)-1 == getLOC(fileLocation, false)[0];
+}
+test bool a3MultiLine(){
+	 loc fileLocation = |project://testJava/src/testJava/A3.java|;
+	 fileLines = readFileLines(fileLocation);
+	 return size(fileLines)-3 == getLOC(fileLocation, false)[0];
+}
+test bool a4MultiLine(){
+	 loc fileLocation = |project://testJava/src/testJava/A4.java|;
+	 fileLines = readFileLines(fileLocation);
+	 return size(fileLines)-7 == getLOC(fileLocation, false)[0];
+}
+test bool aEmptyLines(){
+	 loc fileLocation = |project://testJava/src/testJava/A5.java|;
+	 fileLines = readFileLines(fileLocation);
+	 return size(fileLines)-4 == getLOC(fileLocation, false)[0];
+}

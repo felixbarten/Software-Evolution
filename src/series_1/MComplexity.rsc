@@ -28,12 +28,6 @@ public int calcMethodCC(methodAST){
 	return i;
 } 
 
-test bool t1(){
-	myModel = createM3FromEclipseProject(|project://testJava/|);
-	totalLoc = 47;
-	result = calcCCScore(47, myModel); 	
-	return result[0] == 5;
-}
 
 public list[tuple[loc,int,int]] calcProjectCC(M3 input){
 	model = input;
@@ -91,10 +85,10 @@ public tuple [ int, lrel[ loc, int, int], tuple[int,int,int,int] ] calcCCScore( 
 	//println(high);
 	//println(veryHigh);
 
-	pL = toInt(low*1.0/totalLoc*100);
-	pM = toInt(moderate*1.0/totalLoc*100);
-	pH = toInt(high*1.0/totalLoc*100);
-	pV = toInt(veryHigh*1.0/totalLoc*100);
+	pL = round(low*1.0/totalLoc*100);
+	pM = round(moderate*1.0/totalLoc*100);
+	pH = round(high*1.0/totalLoc*100);
+	pV = round(veryHigh*1.0/totalLoc*100);
 
 	if( pM > 50 || pH > 15 || pV > 5 ){
 		result = 1;	
@@ -109,4 +103,18 @@ public tuple [ int, lrel[ loc, int, int], tuple[int,int,int,int] ] calcCCScore( 
 	}
 		
     return <result, sort(methodCCs, bool(tuple[loc,int,int] a, tuple[loc,int,int] b){ return a[2] > b[2]; }), <pL, pM, pH, pV>>;
+}
+
+test bool decisionsAndLoops(){
+	loc fileLocation = |project://testJava/src/testJava/A.java|;
+	model = createM3FromEclipseProject(fileLocation);
+    score = calcCCScore(model,15);
+	return score[0] == 5;
+}
+
+test bool t1(){
+	myModel = createM3FromEclipseProject(|project://testJava/|);
+	totalLoc = 47;
+	result = calcCCScore(myModel,totalLoc); 	
+	return result[0] == 5;
 }
