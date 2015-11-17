@@ -59,7 +59,7 @@ public void setup(loc project, bool debug, loc logfile) {
 	iprintln("Total Comments: <totalComments>");
 	volScore = calcLOCScore(totalLinesOfCode);
 	scoreV = printVerdict(volScore);
-	printLOC(containmentLocs, logfile);
+	printLOC(containmentLocs, logfile, project);
  	Duration LOCDuration = createDuration(beginLOC, now());
 	printMetricCalculationTime(LOCDuration, "Lines Of Code", logfile);	
 	println("");

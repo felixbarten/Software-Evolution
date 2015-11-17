@@ -16,6 +16,8 @@ public loc startReport(list[loc] projects) {
 	str msg  = "\<html\>\<header\>";
 	writeFile(logfile, msg);	
 	appendToFile(logfile, "\<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\"\>");
+	appendToFile(logfile, "\<link href=\"css/custom.css\" rel=\"stylesheet\"\>");
+	
 	appendToFile(logfile, "\</header\>\<body\>");
 	appendToFile(logfile, "\<script src=\"js/bootstrap.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<script src=\"js/d3.min.js\"\>\</script\>");
@@ -47,7 +49,7 @@ public void endReport(loc file) {
 }
 
 
-public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) {
+public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile, loc project) {
 	// aggregate results
 	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
 	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
@@ -57,8 +59,32 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile) 
 	appendToFile(logfile, "Total LOC: <totalLinesOfCode>\</br\>");
 	appendToFile(logfile, "Total Blank lines: <totalBlankLines>\</br\>");
 	appendToFile(logfile, "Total Comments: <totalComments>\</br\>");
-	appendToFile(logfile, "The Lines of Code for this project was rated: \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>\</br\>");
 	
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>");
+	appendToFile(logfile, "\<thead\>\<th class=\"col-md-3\"\>Lines of Code\</th\>\<th class=\"col-md-3\"\>Blank Lines\</th\>\<th class=\"col-md-3\"\>Comments\</th\>\<th class=\"col-md-3\"\>Total\</th\>\</thead\>\<tbody\>");	
+	real total = toReal(totalComments +totalBlankLines +totalLinesOfCode);
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td style=\"\"\><totalLinesOfCode>\</td\>");
+	appendToFile(logfile, "\<td\><totalBlankLines>\</td\>");
+	appendToFile(logfile, "\<td\><totalComments>\</td\>");
+	appendToFile(logfile, "\<td\><total>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td style=\"\"\><(totalLinesOfCode / total) * 100.0>%\</td\>");
+	appendToFile(logfile, "\<td\><(toReal(totalBlankLines) / toReal(total)) *100.0>%\</td\>");
+	appendToFile(logfile, "\<td\><(totalComments / total) * 100.0>%\</td\>");
+	appendToFile(logfile, "\<td\>100%\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\</tbody\>\</table\>");	
+	
+	appendToFile(logfile, "The Lines of Code for this project was rated: \<strong\><printVerdict(calcLOCScore(totalLinesOfCode))>\</strong\>\</br\>");
+
+	// graphs
+	appendToFile(logfile, "\<div id=\"<printProjectID(project)>loc\" class=\"nvd3chart\"\>\<svg\>\</svg\>\</div\>");
+	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.loc = [{\"label\": \"Blank\", \"value\": <totalBlankLines>}, {\"label\": \"Comments\", \"value\": <totalComments>}, {\"label\": \"Lines of Code\", \"value\": <totalLinesOfCode>}] \</script\>");
 }
 
 public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile) {
@@ -93,7 +119,7 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 	
 }
 
-public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int, int]] cc, loc logfile, loc project) {
+public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, real, real]] cc, loc logfile, loc project) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	
@@ -118,13 +144,24 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[int, int, int,
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
 	
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>");
+	appendToFile(logfile, "\<thead\>\<th class=\"col-md-3\"\>Low\</th\>\<th class=\"col-md-3\"\>Moderate\</th\>\<th class=\"col-md-3\"\>High\</th\>\<th class=\"col-md-3\"\>Very High\</th\>\</thead\>\<tbody\>");		
+	appendToFile(logfile, "\<tr\>");
+	appendToFile(logfile, "\<td style=\"\"\><cc[2][0]>\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][1]>\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][2]>\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][3]>\</td\>");
+	appendToFile(logfile, "\</tr\>");
+	
+	appendToFile(logfile, "\</tbody\>\</table\>");	
+	
+	appendToFile(logfile, "The cyclomatic complexity for this project was rated: \<strong\><printVerdict(cc[0])>\</strong\>\</br\>");
+	
+	
 	// graphs
 	appendToFile(logfile, "\<div id=\"<printProjectID(project)>cc\"\>\<svg\>\</svg\>\</div\>");
 	//appendToFile(logfile, "\<script\>projects[\"<printProjectID(project)>\"][\"cc\"] = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
-	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.cc = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
-	
-	println(cc[2]);
-	
+	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.cc = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");	
 	
 }
 

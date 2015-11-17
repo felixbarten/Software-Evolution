@@ -7,24 +7,12 @@
 	var keys = Object.keys(projects);
 	var i = 0;
 
-	//Regular pie chart example
-	nv.addGraph(function() {
-	  var mychart = nv.models.pieChart()
-	      .x(function(d) { return d.label })
-	      .y(function(d) { return d.value })
-	      .showLabels(true);
-	
-		var selectorStr = "#" + keys[0] + "cc" + " svg";
-		console.log("Selector: :" + selectorStr);
-	    d3.select(selectorStr)
-	        .datum(projects[keys[0]].cc)
-	        .transition().duration(350)
-	        .call(mychart);
-	
-	  return mychart;
-	});
+for (key in keys) { 
+	console.log(keys[key]);
+	createCharts(keys[key]);
+}
 
-	i = 1;
+function createCharts (obj) {
 
 	//Regular pie chart example
 	nv.addGraph(function() {
@@ -32,50 +20,48 @@
 	      .x(function(d) { return d.label })
 	      .y(function(d) { return d.value })
 	      .showLabels(true);
-		console.log(i);
-		
-		var selectorStr = "#" + keys[1] + "cc" + " svg";
-		console.log(selectorStr);
+	
+		var selectorStr = "#" + obj + "cc" + " svg";
+		console.log("Selector: :" + selectorStr);
 	    d3.select(selectorStr)
-	        .datum(projects[keys[1]].cc)
+	        .datum(projects[obj].cc)
 	        .transition().duration(350)
-	        .call(chart);
+	        .call(chart)
+		    .style({ 'width': '300px', 'height': '300px' });
+	        
+	 	nv.utils.windowResize(chart.update);
 	
 	  return chart;
 	});
+	
 	//Regular pie chart example
 	nv.addGraph(function() {
-	  var mychart = nv.models.pieChart()
+	  var chart = nv.models.pieChart()
 	      .x(function(d) { return d.label })
 	      .y(function(d) { return d.value })
 	      .showLabels(true);
+	      
+	      //.width(300)
+	      //.height(300);
 	
-		var selectorStr = "#" + keys[2] + "cc" + " svg";
+		var selectorStr = "#" + obj + "loc" + " svg";
 		console.log("Selector: :" + selectorStr);
 	    d3.select(selectorStr)
-	        .datum(projects[keys[2]].cc)
+	        .datum(projects[obj].loc)
 	        .transition().duration(350)
-	        .call(mychart);
+	        .call(chart);
+	    
+	    
+	    //    .style({ 'width': '300px', 'height': '300px' });
 	
-	  return mychart;
+	  nv.utils.windowResize(chart.update);
+		
+	  return chart;
 	});
 	
-		//Regular pie chart example
-	nv.addGraph(function() {
-	  var mychart = nv.models.pieChart()
-	      .x(function(d) { return d.label })
-	      .y(function(d) { return d.value })
-	      .showLabels(true);
+}
 	
-		var selectorStr = "#" + keys[3] + "cc" + " svg";
-		console.log("Selector: :" + selectorStr);
-	    d3.select(selectorStr)
-	        .datum(projects[keys[i]].cc)
-	        .transition().duration(350)
-	        .call(mychart);
 	
-	  return mychart;
-	});
 function first(obj) {
 	for (var a in obj) return a;
 }
