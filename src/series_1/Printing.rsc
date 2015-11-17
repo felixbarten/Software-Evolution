@@ -123,9 +123,8 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 
 public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, real, real]] cc, loc logfile, loc project) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
-	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
-	
 	/*
+	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	for (method <- cc[1]) {
 		if (size(cc[1]) < 20) {
 			appendToFile(logfile, "\<tr\>");
