@@ -50,8 +50,8 @@ public tuple[ real, int] getDuplicates(M3 model, rel [str, int, int] unitsizes, 
 				duplicates += 1;
 				duplicateLineSets = push(slice, duplicateLineSets);
 
-				if(end+6 > size(srcLines) -1) break;
-				else end +=6;	
+				if(end+1 > size(srcLines) -1) break;
+				else end +=1;	
 				
 			} else {
 

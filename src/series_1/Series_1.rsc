@@ -100,8 +100,13 @@ public void setup(loc project, bool debug, loc logfile) {
  	datetime beginCC = now();
 	println("");
  	println("Starting Cyclomatic Complexity");
+ 	int totalUnitLOC = 0;
+ 	for (unit <- unitsizes[1]) {
+ 		totalUnitLOC += unit[1];
+ 	}
+ 	
  	//Calcute Mcabe CC
-    cc =  calcCCScore(myModel, totalLinesOfCode);
+    cc =  calcCCScore(myModel, totalUnitLOC);
     scoreCC = printVerdict(cc[0]);
  	iprintln("MCabe Cyclomatic Complexity Category: <scoreCC>");
  	iprintln("Top 3 Methods CC: <take(3,cc[1])>");
