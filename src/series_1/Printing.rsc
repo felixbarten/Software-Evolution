@@ -162,7 +162,6 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, re
 	
 	// graphs
 	appendToFile(logfile, "\<div id=\"<printProjectID(project)>cc\"\>\<svg\>\</svg\>\</div\>");
-	//appendToFile(logfile, "\<script\>projects[\"<printProjectID(project)>\"][\"cc\"] = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");
 	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.cc = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");	
 	
 }
