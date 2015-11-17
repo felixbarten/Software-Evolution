@@ -12,28 +12,22 @@ public int calcMethodCC(methodAST){
 	int i = 1;
 
 	visit(methodAST){
-		case "if"(_, _) : i +=1;
-		case "if"(_, _,_) : i += 1;
-		case "conditional"(_, _,_) : i +=1;
-		case "while"(_, _) : i += 1;
-		case "for"(_, _, _) : i += 1;
-		case "for"(_, _, _, _) : i +=1;
-		case "foreach"(_, _, _) : i +=1;
-		case "case"(_) : i += 1;
-		case "infix"(_,"&&",_) : i += 1;
-		case "infix"(_,"||",_) : i += 1;
-		case "catch"(_, _): i += 1;
+		case \if(_, _) : i +=1;
+		case \if(_, _,_) : i += 1;
+		case \conditional(_, _,_) : i +=1;
+		case \while(_, _) : i += 1;
+		case \for(_, _, _) : i += 1;
+		case \for(_, _, _, _) : i +=1;
+		case \foreach(_, _, _) : i +=1;
+		case \case(_) : i += 1;
+		case \infix(_,"&&",_) : i += 1;
+		case \infix(_,"||",_) : i += 1;
+		case \catch(_, _): i += 1;
 	}
 
 	return i;
 } 
 
-test bool t1(){
-	myModel = createM3FromEclipseProject(|project://testJava/|);
-	totalLoc = 47;
-	result = calcCCScore(47, myModel); 	
-	return result[0] == 5;
-}
 
 public list[tuple[loc,int,int]] calcProjectCC(M3 input){
 	model = input;
@@ -91,10 +85,10 @@ public tuple [ int, lrel[ loc, int, int], tuple[real,real,real,real] ] calcCCSco
 	//println(high);
 	//println(veryHigh);
 
-	pL = toReal(low*1.0/totalLoc*100);
-	pM = toReal(moderate*1.0/totalLoc*100);
-	pH = toReal(high*1.0/totalLoc*100);
-	pV = toReal(veryHigh*1.0/totalLoc*100);
+	pL = round(low*1.0/totalLoc*100,0.01);
+	pM = round(moderate*1.0/totalLoc*100,0.01);
+	pH = round(high*1.0/totalLoc*100, 0.01);
+	pV = round(veryHigh*1.0/totalLoc*100, 0.01);
 
 	if( pM > 50 || pH > 15 || pV > 5 ){
 		result = 1;	
@@ -109,4 +103,18 @@ public tuple [ int, lrel[ loc, int, int], tuple[real,real,real,real] ] calcCCSco
 	}
 		
     return <result, sort(methodCCs, bool(tuple[loc,int,int] a, tuple[loc,int,int] b){ return a[2] > b[2]; }), <pL, pM, pH, pV>>;
+}
+
+test bool decisionsAndLoops(){
+	loc fileLocation = |project://testJava/src/testJava/A.java|;
+	model = createM3FromEclipseProject(fileLocation);
+    score = calcCCScore(model,15);
+	return score[0] == 5;
+}
+
+test bool t1(){
+	myModel = createM3FromEclipseProject(|project://testJava/|);
+	totalLoc = 47;
+	result = calcCCScore(myModel,totalLoc); 	
+	return result[0] == 5;
 }

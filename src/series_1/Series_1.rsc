@@ -154,6 +154,7 @@ public void getMetrics(bool debug){
 	//list[loc] projects = [|project://hsqldb-2.3.1|, |project://JavaTest|, |project://JavaTest2|,|project://smallsql0.21_src|];
 	list [loc] projects = [|project://smallsql0.21_src|];
 
+	//list [loc] projects = [|project://testJava|];
 	println("Starting metrics analysis on <size(projects)> projects");
 	logfile = startReport(projects);
 	

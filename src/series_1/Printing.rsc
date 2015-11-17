@@ -22,6 +22,7 @@ public loc startReport(list[loc] projects) {
 	appendToFile(logfile, "\<script src=\"js/bootstrap.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<script src=\"js/d3.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<script src=\"js/nvd3.min.js\"\>\</script\>");
+	appendToFile(logfile, "\<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js\"\>\</script\>");
 	appendToFile(logfile, "\<script\>var projects = {");
 	int sizeOf = size(projects) - 1;
 	for (project <- projects){
@@ -90,8 +91,8 @@ public void printLOC(map[loc, tuple[int,int,int]] containmentLocs, loc logfile, 
 public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile) {
 	appendToFile(logfile, "\<h2\>Unit Size per method\</h2\>");
 	
-	/*
-	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>\<thead\>\<th class=\"col-md-6\"\>Method Name\</th\>\<th class=\"col-md-3\"\>LOC\</th\>\<th class=\"col-md-3\"\>Judgement\</th\>\</thead\>\<tbody\>");	
+	//appendToFile(logfile, "\<button id=\"showUC\"\>Show\</button\>");
+	appendToFile(logfile, "\<table id=\"uc\" style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table hidden table-striped table-bordered\" \>\<thead\>\<th class=\"col-md-6\"\>Method Name\</th\>\<th class=\"col-md-3\"\>LOC\</th\>\<th class=\"col-md-3\"\>Judgement\</th\>\</thead\>\<tbody\>");	
 	for (unit <- unitsizes[1]) {
 		// omit small unit sizes
 		if (size(unitsizes[1]) <= 20) {
@@ -113,7 +114,7 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 		
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>");	
-	*/
+	
 	
 	appendToFile(logfile, "\<h2\>Unit Size for project\</h2\>");
 	
@@ -123,8 +124,9 @@ public void printUnitSize(tuple [int, rel[str, int, int]] unitsizes, loc logfile
 
 public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, real, real]] cc, loc logfile, loc project) {
 	appendToFile(logfile, "\<h2\>Cyclomatic Complexity\</h2\>");
-	/*
-	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
+	//appendToFile(logfile, "\<button \>Show\</button\>");
+	
+	appendToFile(logfile, "\<table id=\"cc\" style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table hidden table-striped table-bordered\"\>\<thead\>\<th class=\"col-lg-6\"\>Method Name\</th\>\<th class=\"col-lg-3\"\>LOC\</th \>\<th class=\"col-lg-3\"\>Complexity(CC)\</th\>\</thead\>\<tbody\>");
 	for (method <- cc[1]) {
 		if (size(cc[1]) < 20) {
 			appendToFile(logfile, "\<tr\>");
@@ -144,7 +146,7 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, re
 		appendToFile(logfile, "Results lower than 5 CC ommitted");
 	}
 	appendToFile(logfile, "\</tbody\>\</table\>\</br\>");
-	*/
+	
 	
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>");
 	appendToFile(logfile, "\<thead\>\<th class=\"col-md-3\"\>Low\</th\>\<th class=\"col-md-3\"\>Moderate\</th\>\<th class=\"col-md-3\"\>High\</th\>\<th class=\"col-md-3\"\>Very High\</th\>\</thead\>\<tbody\>");		
@@ -165,7 +167,7 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, re
 	appendToFile(logfile, "\<script\>projects.<printProjectID(project)>.cc = [{\"label\": \"Trivial\", \"value\": <cc[2][0]>}, {\"label\": \"Moderate\", \"value\": <cc[2][1]>}, {\"label\": \"High\", \"value\": <cc[2][2]>}, {\"label\": \"Very High\", \"value\": <cc[2][3]>}] \</script\>");	
 	
 }
-
+  
 public str printProjectID(loc project){
 	return replaceAll(project.authority, ".","_");
 }
@@ -247,5 +249,7 @@ public void printMaintainability(int analysability, int changeability, int stabi
 }
 public void printEndProject(loc logfile, loc project) {
 	//appendToFile(logfile, "\<script\>delete projects.<printProjectID(project)>\</script\>");
+	appendToFile(logfile, "\<script \> $(\"#showUC\").on(\"click\", function(){ $(\"#cc\").toggleClass(\"hidden\");}\</script\>");
+	appendToFile(logfile, "\<script \> $(\"#showCC\").on(\"click\", function(){ $(\"#cc\").toggleClass(\"hidden\");}\</script\>");
 }
 
