@@ -150,10 +150,10 @@ public void printComplexity(tuple[int, lrel[loc, int, int], tuple[real, real, re
 	appendToFile(logfile, "\<table style=\"width: 1200px;word-wrap: break-word;table-layout:fixed;\" class=\"table table-striped table-bordered\" \>");
 	appendToFile(logfile, "\<thead\>\<th class=\"col-md-3\"\>Low\</th\>\<th class=\"col-md-3\"\>Moderate\</th\>\<th class=\"col-md-3\"\>High\</th\>\<th class=\"col-md-3\"\>Very High\</th\>\</thead\>\<tbody\>");		
 	appendToFile(logfile, "\<tr\>");
-	appendToFile(logfile, "\<td style=\"\"\><cc[2][0]>\</td\>");
-	appendToFile(logfile, "\<td\><cc[2][1]>\</td\>");
-	appendToFile(logfile, "\<td\><cc[2][2]>\</td\>");
-	appendToFile(logfile, "\<td\><cc[2][3]>\</td\>");
+	appendToFile(logfile, "\<td style=\"\"\><cc[2][0]>%\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][1]>%\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][2]>%\</td\>");
+	appendToFile(logfile, "\<td\><cc[2][3]>%\</td\>");
 	appendToFile(logfile, "\</tr\>");
 	
 	appendToFile(logfile, "\</tbody\>\</table\>");	
