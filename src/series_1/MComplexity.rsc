@@ -12,17 +12,17 @@ public int calcMethodCC(methodAST){
 	int i = 1;
 
 	visit(methodAST){
-		case "if"(_, _) : i +=1;
-		case "if"(_, _,_) : i += 1;
-		case "conditional"(_, _,_) : i +=1;
-		case "while"(_, _) : i += 1;
-		case "for"(_, _, _) : i += 1;
-		case "for"(_, _, _, _) : i +=1;
-		case "foreach"(_, _, _) : i +=1;
-		case "case"(_) : i += 1;
-		case "infix"(_,"&&",_) : i += 1;
-		case "infix"(_,"||",_) : i += 1;
-		case "catch"(_, _): i += 1;
+		case \if(_, _) : i +=1;
+		case \if(_, _,_) : i += 1;
+		case \conditional(_, _,_) : i +=1;
+		case \while(_, _) : i += 1;
+		case \for(_, _, _) : i += 1;
+		case \for(_, _, _, _) : i +=1;
+		case \foreach(_, _, _) : i +=1;
+		case \case(_) : i += 1;
+		case \infix(_,"&&",_) : i += 1;
+		case \infix(_,"||",_) : i += 1;
+		case \catch(_, _): i += 1;
 	}
 
 	return i;
