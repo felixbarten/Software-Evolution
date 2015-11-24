@@ -5,6 +5,11 @@ import series_2::Type_II;
 import series_2::Type_III;
 import series_2::Type_IV;
 import series_2::Printing;
+
+import series_1::UnitSize;
+import series_1::LOC;
+import series_1::Scoring;
+
 import analysis::statistics::Descriptive;
 import Prelude;
 import DateTime;
@@ -26,6 +31,47 @@ public void setup(loc project, bool debug, loc logfile) {
 	totalLOC = 0;
 	containmentLocs = ();
 	appendToFile(logfile, "\<h1\>Results for project: <project.authority>\</h1\>");
+	
+	
+	// start LOC
+	datetime beginLOC = now();
+	println("Starting LOC calculation");
+	int classesSize = size(classes(myModel));
+	int counter = 0;
+	for (class <- classes(myModel)) {
+		if (counter % 100 == 0) 
+			println("Calculated LOC for <counter> out of <classesSize> classes");
+		counter += 1; 
+		list[loc] units = [c | c <- invert(myModel@containment)[class], c.scheme == "java+compilationUnit"];
+		for (loc unit <- units){
+			if (debug) 
+				iprintln("Parsing: <unit>");
+			if (unit notin parsed) {
+				containmentLocs += (unit: getLOC(unit, debug));
+				parsed += unit;
+			}
+		}
+	}	
+	// aggregate results
+	totalLinesOfCode = ((0 | it + (containmentLocs[c])[0] | c <- containmentLocs));
+	totalBlankLines = ((0 | it + (containmentLocs[c])[1] | c <- containmentLocs));
+	totalComments = ((0 | it + (containmentLocs[c])[2] | c <-containmentLocs));
+	
+	//Display LOC results
+	iprintln("Total LOC: <totalLinesOfCode>");
+	iprintln("Total Blank lines: <totalBlankLines>");
+	iprintln("Total Comments: <totalComments>");
+	volScore = calcLOCScore(totalLinesOfCode);
+	scoreV = printVerdict(volScore);
+	//printLOC(containmentLocs, logfile, project);
+ 	Duration LOCDuration = createDuration(beginLOC, now());
+	printMetricCalculationTime(LOCDuration, "Lines Of Code", logfile);	
+	//println("");
+ 	//iprintln("Volume Category for project:  <totalLinesOfCode>(<scoreV>)");
+	// end LOC
+	
+	
+	getDuplicates2(myModel, debug);
 	
 }
 
