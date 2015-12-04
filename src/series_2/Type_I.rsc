@@ -10,6 +10,13 @@ alias Snip = tuple[loc location, list[str] lines];
 alias Snips = lrel[loc, list[str]]; 
 
 
+public value getCloneClasses(rel[value, value] a){
+	a += ident(carrier(a)); 
+	res = groupRangeByDomain(a);
+
+	return for ( c<- res) if(size(c) > 1) append c;	
+}
+
 public tuple[ real, int] getDuplicates(loc project, bool debug, int totalLOC) {
 	 
 	model = createM3FromEclipseProject(project);
@@ -81,11 +88,13 @@ public tuple[ real, int] getDuplicates(loc project, bool debug, int totalLOC) {
 			}
 		}
 	}
-
+	cloneClasses = getCloneClasses(clonePairs);
 	if(debug){
-		iprintln(duplicateLineSets);
-		println("duplicates <duplicates>");
-		iprintln(getOneFrom(clonePairs));
+		//iprintln(duplicateLineSets);
+	//	println("duplicates <duplicates>");
+		//iprintln(getOneFrom(clonePairs));
+		iprintln(cloneClasses);
+
 	}
 	
 	real percentageDuplicates = duplicates *6.0 /totalLOC * 100.0;
