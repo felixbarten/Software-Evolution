@@ -8,55 +8,52 @@ import lang::java::m3::Core;
 import util::Math;
 
 
-alias snip = tuple[node, loc];
-public set[Declaration] asts = {};
+alias snip = tuple[ loc location, value code];
+public set[node] asts = {};
 //public map[node, tuple[loc,set[node]]] bucket = ();
 public map[node, set[node]] bucket = ();
+
+
 
 private set[Declaration] normalizeAst(set[Declaration] ast){
 
 	visit(ast){
-	//	case \type(_) => \type(int())
+	//	case \type(_) => \type(\int())
 	default: ;
 	}
 
 
 }
  
-public set[node] getDups(loc project) {
-	map[node, rel[loc,node]] m = ();
+public map[value, rel[loc,value]] getDups(loc project) {
+	map[value, rel[loc, value]] m = ();
 	asts =  createAstsFromEclipseProject(project, true);
-	rel[snip] clonePairs = {};
-	int subTreeSizeThreshold = 6;	
-	void addSubtreeToMap(map[node, rel[loc,node]] m, node a){
-			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
-				loc source = |null://null|;
-					if(a@src?){ 	
-						source = a@src;
-					}
+	rel[snip, snip] clonePairs = {};
+	int subTreeSizeThreshold = 2;	
 
+	void addSubtreeToMap( value a){
+			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
+				loc source = |project://testJava|;
+					//if(a@src?){ //todo?	
+					//	source = a@src;
+					//}
 				if(m[a]?){
 					m[a] += <source, a>;
 				} else {
-					m[a] = {<source, a>};
+				    rel[loc, value] b = {<source, a>};
+					m[a] = b;
 				}
 			}
 	}
 	
 
 	bottom-up visit(asts) {
-		case Declaration a:{
-			addSubtreeToMap(m,a);
-		}
-		case Statement a:{
-			addSubtreeToMap(m,a);
-		}
-		case Expression a:{
-			addSubtreeToMap(m,a);
+		case node a:{
+			addSubtreeToMap(a);
 		}
 	 }
 
-	bottom-up visit(asts) {
+/*	bottom-up visit(asts) {
 		case node a:{
 			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
 					  if(a notin bucket){
@@ -69,25 +66,36 @@ public set[node] getDups(loc project) {
 			}
 		}
 	 }
-
-	 for(b <- range(bucket), size(b) >= 2){
-		iprintln();
-	 }
+*/
 	
-	iprintln(asts);	
+	 void removeExistingSubtree(ast){
+		bottom-up visit(ast) {
+			case node subtree:{
+				clonePairs = {< l,  r> | < snip l,snip  r> <-clonePairs, r.code != subtree}; 
+			}
+		}
+	 }
+	 cand = domain(m);
+	//SimThreshold = 0.375
+		for(tuple[node first, node second] pair <- cand * cand , pair.first != pair.second, calcSimularity(pair.first,pair.second) >= 0.375){
+			removeExistingSubtree(pair.first);
+			removeExistingSubtree(pair.second);
+			clonePairs += m[pair.first] * m[pair.second];
+		}
+	
 	iprintln(size(clonePairs));
-	return {};	
+	return m;	
 }
 
 set[node] treeToSet(node t){
-	set[node] t = {};
+	set[node] r = {};
 
 	visit(t){
 		case node x:{
-			t += x;	
+			r += x;	
 		}	
 	}
-	return t;
+	return r;
 }
 
 //2xS/(2xS+L+R)
@@ -96,7 +104,7 @@ real calcSimularity(node l, node r){
 	set[node] right = treeToSet(r);
 	real nShared = toReal(size(left & right));
 
-	return 2*nShared/(2*nShared + size(l) + size(r)); 
+	return 2*nShared/(2*nShared + size(left) + size(right)); 
 }
 
 int calcSubtreeSize(node n){
@@ -113,7 +121,7 @@ test bool calculateSubtreeSizeTest(int c){
 	if ( c <= 0){
 		c = 1 - c;	
 	}
-	if (c > 1000){
+	if (c > 1000){	
 	 c = 1000;
 	}
 	node m = makeNode("f", "");
