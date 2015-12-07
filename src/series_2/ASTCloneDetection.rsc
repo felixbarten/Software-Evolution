@@ -12,13 +12,23 @@ alias snip = tuple[node, loc];
 public set[Declaration] asts = {};
 //public map[node, tuple[loc,set[node]]] bucket = ();
 public map[node, set[node]] bucket = ();
+
+private set[Declaration] normalizeAst(set[Declaration] ast){
+
+	visit(ast){
+	//	case \type(_) => \type(int())
+	default: ;
+	}
+
+
+}
  
 public set[node] getDups(loc project) {
 	map[node, rel[loc,node]] m = ();
 	asts =  createAstsFromEclipseProject(project, true);
-	rel[snip] clonePairs = [];
-	int subTreeSizeThreshold = 4;	
-	void addSubTreeToMap(map m, node a){
+	rel[snip] clonePairs = {};
+	int subTreeSizeThreshold = 6;	
+	void addSubtreeToMap(map[node, rel[loc,node]] m, node a){
 			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
 				loc source = |null://null|;
 					if(a@src?){ 	
@@ -32,6 +42,7 @@ public set[node] getDups(loc project) {
 				}
 			}
 	}
+	
 
 	bottom-up visit(asts) {
 		case Declaration a:{
@@ -65,7 +76,6 @@ public set[node] getDups(loc project) {
 	
 	iprintln(asts);	
 	iprintln(size(clonePairs));
-	//return lol;
 	return {};	
 }
 
