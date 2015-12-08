@@ -33,7 +33,7 @@ public rel[snip, snip] getDups(loc project) {
 	map[value, rel[loc, value]] m = ();
 	asts =  rewriteAST(createAstsFromEclipseProject(project, true));
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 10;	
+	int subTreeSizeThreshold = 40;	
 	real similarityThreshold = 0.5;
 
 	void addSubtreeToMap(subtree){
