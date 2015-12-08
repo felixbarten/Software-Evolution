@@ -7,21 +7,24 @@
 	var keys = Object.keys(projects);
 	var i = 0;
 
-	//Regular pie chart example
+	//Regular bar chart
 	nv.addGraph(function() {
-	  var mychart = nv.models.pieChart()
-	      .x(function(d) { return d.label })
+	  var chart = nv.models.discreteBarChart()
+	      .x(function(d) { return d.label })    //Specify the data accessors.
 	      .y(function(d) { return d.value })
-	      .showLabels(true);
+	      .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+	      .tooltips(false)        //Don't show tooltips
+	      .showValues(true)       //...instead, show the bar value right on top of each bar.
+	      .transitionDuration(350)
+	      ;
 	
-		var selectorStr = "#" + keys[0] + "cc" + " svg";
-		console.log("Selector: :" + selectorStr);
-	    d3.select(selectorStr)
-	        .datum(projects[keys[0]].cc)
-	        .transition().duration(350)
-	        .call(mychart);
+	  d3.select('#chart svg')
+	      .datum(exampleData())
+	      .call(chart);
 	
-	  return mychart;
+	  nv.utils.windowResize(chart.update);
+	
+	  return chart;
 	});
 
 	i = 1;

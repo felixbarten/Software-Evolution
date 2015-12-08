@@ -56,6 +56,11 @@ local.properties
 .target
 
 reports/report.html
+reports/clonereport.html
+!reports/json/.gitkeep
+reports/json/
+
+
 
 # TeXlipse plugin
 .texlipse

@@ -8,6 +8,7 @@ import lang::java::m3::Core;
 import util::Math;
 import DateTime;
 import series_2::Type_II;
+import series_2::Printing;
 
 
 alias snip = tuple[ loc location, value code];
@@ -39,11 +40,12 @@ public void printSnips (rel[snip, snip] clones){
  }
 
  public rel[snip, snip] getDups(loc project) {
+	loc report = startReport(project);
 
 	datetime beginTime = now();
 	map[value, rel[loc, value]] m = ();
 	set[node] asts = rewriteAST(createAstsFromEclipseProject(project, true));
-	iprintln(" size: <size(asts)>");
+	iprintln("Size: <size(asts)>");
 	rel[snip, snip] clonePairs = {};
 	int subTreeSizeThreshold = 6;	
 	real similarityThreshold = 0.6;
@@ -99,8 +101,15 @@ public void printSnips (rel[snip, snip] clones){
 	str pDur(Duration duration){
 	 return durationStr = "Total calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
 	}	
+	
+	printSnipsToFile(clonePairs, report);
+	printBarGraph(clonePairs, report);
+	
 	iprintln("Found clones: <size(clonePairs)>");	
-	iprintln("Execution time: <pDur(createDuration(beginTime, now()))>"); 	
+	Duration execution = createDuration(beginTime, now());
+	iprintln("Execution time: <pDur(execution)>");
+	printProjectExecutionTime(execution, report); 	
+	endReport(report);
 	return clonePairs;	
 }
 
