@@ -1,7 +1,7 @@
-package testJava;''
+package testJavaf;''
 /*
  MultiLineComment 
-*/ public class CommentHell2ß { //Comments in your comments
+*/ public class CommentHell2 { //Comments in your comments
 /*ey ​*/    void /*​ what am I even doing*/ helloWorld(){ //fdfd
         int i/* and another one just for fun*/;
         i = 0; //dfsfs
@@ -17,7 +17,7 @@ package testJava;''
     }
     
     public float clone() {
-    	double i = 0;
+    	float i = 0;
     	float j = 0; 
     	
     	System.out.println(i + j);
