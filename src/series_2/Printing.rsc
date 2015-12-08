@@ -83,7 +83,13 @@ public void printMatrixGraph(rel[snip, snip] clonepairs) {
 	loc JSON = |project://Software-Evolution/reports/json/matrix.json|;
 }
 
-public void printBarGraph(rel[snip, snip] clonepairs, loc file) {
+public void printChordDiagram(rel[snip, snip] clonepairs, loc file) {
+	loc JSON = |project://Software-Evolution/reports/json/chordgraph.js|;
+	startJSON(JSON);
+	
+}
+
+public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/bargraph.js|;
@@ -99,7 +105,22 @@ public void printBarGraph(rel[snip, snip] clonepairs, loc file) {
 		values += "\t{\n";
 		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
 		lines =  pair.first.location.end.line - pair.first.location.begin.line;
-		values += "\t\t\"value\": <lines>\n";
+		values += "\t\t\"value\": <lines>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		
+		index1 = findLast(clone1, project.path);
+		if (index1 != -1){
+			clone1 = substring(clone1, index1); 
+		}
+		
+		values += "\t\t\"clone1\": \"<pair.first.location.path>\",\n";
+		values += "\t\t\"clone2\": \"<pair.second.location.path>\"\n";
 		values += "\t},\n";
 	}
 	// delete trailing ,

@@ -14,10 +14,25 @@
 	      .x(function(d) { return d.label })    //Specify the data accessors.
 	      .y(function(d) { return d.value })
 	      .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
-	      .tooltips(true)        //Don't show tooltips
 	      .showValues(false)       //...instead, show the bar value right on top of each bar.
-	      .showXAxis(false)
-	      ;
+	      .showXAxis(false);
+	      
+	      //chart.interactiveLayer.enabled(true);
+		  chart.tooltip.enabled(true);        //Don't show tooltips
+		  chart.tooltip.gravity("n");
+		  chart.tooltip.position({"top": 200, "left": 500});
+		  chart.tooltip.contentGenerator(function(data) {
+		  	tmpclone = data.data.clone1;
+		  	tmpclone2 = data.data.clone2;
+	 		clone1 = tmpclone.substring(50, tmpclone.length);
+	 		clone1 = "..." + clone1;
+	 		clone2 = tmpclone2.substring(50, tmpclone2.length);
+	 		clone2 = "..." + clone2;
+
+
+	      		var modifiedkey = clone1 + " lines" + data.data.begin1 + "-" + data.data.end1 + " and " + clone2 + " lines:" + data.data.begin2 + "-" + data.data.end2;
+	      		return "<p class='tooltip'> " + modifiedkey + "</p>" + "<p> " + data.data.value + "Lines of Code</p>";
+	      });
 	
 	  d3.select('#barchart svg')
 	      .datum(bardata)
@@ -28,3 +43,13 @@
 	  return chart;
 	});
 	
+
+
+/*
+
+  chart.tooltipContent(function(key, x, y, e, graph) {
+      return '<h3>' + e.series.key  + gettext(' Errors') + '</h3>' +
+      '<p>' +  y + gettext(' Errors on ')  + e.point.date + ' </p>'
+  });
+
+  */
