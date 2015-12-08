@@ -93,7 +93,7 @@ public rel[snip, snip] getDups(loc project) {
 	real similarityThreshold = 0.5;
 
 	void addSubtreeToMap(subtree){
-				loc source = |project://testJava|;
+				loc source = |unknown:///|;
 				
 				try{
 					switch(subtree){
