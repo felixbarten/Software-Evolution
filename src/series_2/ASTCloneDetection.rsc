@@ -10,81 +10,78 @@ import util::Math;
 
 alias snip = tuple[ loc location, value code];
 public set[node] asts = {};
-//public map[node, tuple[loc,set[node]]] bucket = ();
-public map[node, set[node]] bucket = ();
-
 
 
 private set[Declaration] normalizeAst(set[Declaration] ast){
-
 	visit(ast){
 	//	case \type(_) => \type(\int())
 	default: ;
 	}
-
-
 }
  
-public map[value, rel[loc,value]] getDups(loc project) {
+public rel[snip, snip] getDups(loc project) {
 	map[value, rel[loc, value]] m = ();
 	asts =  createAstsFromEclipseProject(project, true);
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 2;	
+	int subTreeSizeThreshold = 6;	
+	real similarityThreshold = 0.5;
 
-	void addSubtreeToMap( value a){
-			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
+	void addSubtreeToMap(subtree){
 				loc source = |project://testJava|;
-					//if(a@src?){ //todo?	
-					//	source = a@src;
-					//}
-				if(m[a]?){
-					m[a] += <source, a>;
+				
+				try{
+					switch(subtree){
+						case Declaration a:	source = a@src;
+						case Statement a:	source = a@src;
+						case Expression a:	source = a@src;
+						case Modifier a:	source = a@src;
+					}
+				} catch: iprintln("No src annotation at <subtree> \n");	
+
+				if(m[subtree]?){
+					m[subtree] += <source, subtree>;
 				} else {
-				    rel[loc, value] b = {<source, a>};
-					m[a] = b;
+				    rel[loc, value] b = {<source, subtree>};
+					m[subtree] = b;
 				}
-			}
 	}
 	
 
 	bottom-up visit(asts) {
 		case node a:{
-			addSubtreeToMap(a);
+			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
+				addSubtreeToMap(a);
+			}
+		}
+	 }
+	
+	 void removeExistingSubtree(ast){
+		bottom-up visit(ast.code) {
+			case node subtree:{
+					clonePairs = {< l, r> | < snip l,snip  r> <-clonePairs, r.code != subtree,l.code != subtree}; 
+			}
 		}
 	 }
 
-/*	bottom-up visit(asts) {
-		case node a:{
-			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
-					  if(a notin bucket){
-					//bucket += (a: <a@src,{}>);
-						bucket += (a: {a});
-					  } else {
-					//bucket[a][1] += a;	
-						bucket[a] += a;	
-					  }
-			}
-		}
-	 }
-*/
-	
-	 void removeExistingSubtree(ast){
-		bottom-up visit(ast) {
-			case node subtree:{
-				clonePairs = {< l,  r> | < snip l,snip  r> <-clonePairs, r.code != subtree}; 
-			}
-		}
-	 }
-	 cand = domain(m);
-	//SimThreshold = 0.375
-		for(tuple[node first, node second] pair <- cand * cand , pair.first != pair.second, calcSimularity(pair.first,pair.second) >= 0.375){
+	buckets = range(m);
+
+	for(bucket <- buckets, size(bucket) > 1){
+		for(tuple[snip first, snip second] pair <- bucket * bucket , pair.first != pair.second, calcSimularity(pair.first.code,pair.second.code) >= similarityThreshold){
 			removeExistingSubtree(pair.first);
 			removeExistingSubtree(pair.second);
-			clonePairs += m[pair.first] * m[pair.second];
+			clonePairs += pair;
 		}
+	}
 	
 	iprintln(size(clonePairs));
-	return m;	
+
+	for(<l,r> <- clonePairs){
+		if(l == r){
+			iprintln("fuck");
+		}
+	}
+	
+	return clonePairs;	
 }
 
 set[node] treeToSet(node t){
@@ -102,9 +99,12 @@ set[node] treeToSet(node t){
 real calcSimularity(node l, node r){
 	set[node] left = treeToSet(l);
 	set[node] right = treeToSet(r);
-	real nShared = toReal(size(left & right));
 
-	return 2*nShared/(2*nShared + size(left) + size(right)); 
+	real nShared = toReal(size(left & right));
+	real dNodesL = toReal(size(left)- nShared);
+	real dNodesR = toReal(size(right) - nShared);
+
+	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
 }
 
 int calcSubtreeSize(node n){
@@ -132,6 +132,16 @@ test bool calculateSubtreeSizeTest(int c){
 	return c == x;	
 }
 
-node createChild(node n){
+test bool calcSimilarityTest1(node b){
+	return calcSimularity(b,b) == 1.0;	
+}
+
+test bool calcSimilarityTest2(){
+	node a = makeNode("a", "1");
+	node b = makeNode("b", "1");
+	return calcSimularity(a,b) == 0.0;	
+}
+
+private node createChild(node n){
 	return makeNode("f", n );
 }
