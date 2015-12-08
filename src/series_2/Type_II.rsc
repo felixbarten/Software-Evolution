@@ -28,11 +28,6 @@ public void detectClones() {
 		}
 	};
 	*/
-	
-	// iprintln(ast)
-	loc filename = |project://Software-Evolution/astprettyprint.txt|;
-	writeFile(filename);
-	//iprintToFile(filename, ast);
 }
 alias snip = tuple[ loc location, value code];
 
@@ -50,10 +45,10 @@ set[Declaration] rewriteAST (set[Declaration] ast) {
 		// classes
 		case \class(name, extends, implements, body) => \class(uniformstr, extends, implements, body)
 		// methods
-		case \method(returntype, name, parameters, exceptions, impl) => \method (returntype, uniformstr, parameters, exceptions, impl)
-		case \method(returntype, name, parameters, exceptions) => \method(returntype, uniformstr, parameters, exceptions)
-		case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, uniformstr, arguments)
-    	case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, uniformstr, arguments)
+		case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions, impl)
+		case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions)
+		//case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, uniformstr, arguments)
+    	//case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, uniformstr, arguments)
     	//variables
 		case \variable(name, extraDimensions) => \variable(uniformstr, extraDimensions)
     	case \variable(name,  extraDimensions, init) => variable(uniformstr, extraDimensions, init)
@@ -81,6 +76,7 @@ public void printLOC (rel[snip, snip] clones){
 	for (tuple[snip, snip] clone <- clones) {
 		iprintln(clone[0][0]);
 		iprintln(clone[1][0]);
+		println();
 	}
 }
 
@@ -89,8 +85,8 @@ public rel[snip, snip] getDups(loc project) {
 	asts =  createAstsFromEclipseProject(project, true);
 	asts = rewriteAST(asts);
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 6;	
-	real similarityThreshold = 0.5;
+	int subTreeSizeThreshold = 10;	
+	real similarityThreshold = 0.0;
 
 	void addSubtreeToMap(subtree){
 				loc source = |unknown:///|;
@@ -147,8 +143,15 @@ public rel[snip, snip] getDups(loc project) {
 		}
 	}
 	printLOC(clonePairs);
+	printASTToFile(asts);
 	
 	return clonePairs;	
+}
+
+public void printASTToFile(set[Declaration] ast) {
+	loc filename = |project://Software-Evolution/astprettyprint.txt|;
+	writeFile(filename);
+	iprintToFile(filename, ast);
 }
 
 int calcSubtreeSize(node n){
@@ -172,6 +175,7 @@ real calcSimularity(node l, node r){
 
 	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
 }
+
 set[node] treeToSet(node t){
 	set[node] r = {};
 
