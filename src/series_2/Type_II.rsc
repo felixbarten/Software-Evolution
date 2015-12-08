@@ -35,30 +35,8 @@ public void detectClones() {
 	iprintToFile(filename, ast);
 }
 
-test bool rewriteVariable() {
-	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
-	
-	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
-	return (AST != rewritten);
-}
-test bool rewriteName() {
-	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
-	
-	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
-	return (AST != rewritten);
-}
-test bool rewriteModifier() {
-	set[Declaration] AST = {\class([\vararg(lang::java::jdt::m3::AST::long(), "")])[@modifiers=[lang::java::jdt::m3::AST::\private()]]};
-	
-	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
-	return (AST != rewritten);
-}
-
 set[Declaration] rewriteAST (set[Declaration] ast) {
-	str uniformstr = "t2";
+	str uniformstr = "str";
 	bool uniformbool = true;
 	str uniformchar = "c";
 	str uniformint = "1";
@@ -98,4 +76,75 @@ set[Declaration] rewriteAST (set[Declaration] ast) {
 	};
 	return a;
 }
+test bool rewriteVariable() {
+	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
+	
+	rewritten = rewriteAST(AST);
+	iprintln(rewritten);
+	return (AST != rewritten);
+}
+test bool rewriteName() {
+	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
+	
+	rewritten = rewriteAST(AST);
+	iprintln(rewritten);
+	return (AST != rewritten);
+}
+test bool rewriteModifier() {
+	set[Declaration] AST = {\class([\vararg(lang::java::jdt::m3::AST::long(), "")])[@modifiers=[lang::java::jdt::m3::AST::\private()]]};
+	
+	rewritten = rewriteAST(AST);
+	iprintln(rewritten);
+	return (AST != rewritten);
+}
+
+test bool rewriteLiteralBool() {
+	AST = getTestAST();
+	rewritten = rewriteAST(AST);
+	visit(rewritten) {
+		case \booleanLiteral(val): return val == true;
+	};
+	
+	iprintln(rewritten);
+	return (AST != rewritten);
+}
+
+test bool rewriteLiteralStr() {
+	AST = getTestAST();
+	rewritten = rewriteAST(AST);
+	visit(rewritten) {
+		case \stringLiteral(val): return val == "str";
+	};
+	return (AST != rewritten);
+}
+
+test bool rewriteLiteralChar() {
+	AST = getTestAST();
+	rewritten = rewriteAST(AST);
+	visit(rewritten) {
+		case \characterLiteral(val): return val == "c";
+	};
+	return (AST != rewritten);
+}
+
+test bool rewriteLiteralInt() {
+	AST = getTestAST();
+	rewritten = rewriteAST(AST);
+	visit(rewritten) {
+		case \number(val): return val == "1";
+	};
+	return (AST != rewritten);
+}
+value getTestAST() {
+	set[Declaration] AST = {\class(
+                    [
+	                    variables(lang::java::jdt::m3::AST::\int(), [variable("testvar1", 0, number("300"))]),
+	                    variables(lang::java::jdt::m3::AST::\string(), [variable("testvar2", 0, stringLiteral("testbal2"))]),
+	                    variables(lang::java::jdt::m3::AST::\char(), [variable("testvar3", 0, characterLiteral("c"))]),
+	                    variables(lang::java::jdt::m3::AST::\boolean(), [variable("testvar4", 0, booleanLiteral(false))])
+                    ])
+    };
+    return AST;
+}
+
 
