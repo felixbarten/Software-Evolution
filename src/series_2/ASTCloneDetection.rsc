@@ -33,11 +33,11 @@ public rel[snip, snip] getDups(loc project) {
 	map[value, rel[loc, value]] m = ();
 	asts =  rewriteAST(createAstsFromEclipseProject(project, true));
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 6;	
+	int subTreeSizeThreshold = 10;	
 	real similarityThreshold = 0.5;
 
 	void addSubtreeToMap(subtree){
-		loc source = |project://testJava|;
+		loc source;
 		
 		try{
 			switch(subtree){
@@ -46,7 +46,7 @@ public rel[snip, snip] getDups(loc project) {
 				case Expression a:	source = a@src;
 				case Modifier a:	source = a@src;
 			}
-		} catch: iprintln("No src annotation at <subtree> \n");	
+		} catch: source = |unknown:///|;	
 
 		if(m[subtree]?){
 			m[subtree] += <source, subtree>;
@@ -67,7 +67,9 @@ public rel[snip, snip] getDups(loc project) {
 	 void removeExistingSubtree(ast){
 		bottom-up visit(ast.code) {
 			case node subtree:{
+					if(ast.code != subtree){
 					clonePairs = {< l, r> | < snip l,snip  r> <-clonePairs, r.code != subtree,l.code != subtree}; 
+					}
 			}
 		}
 	 }

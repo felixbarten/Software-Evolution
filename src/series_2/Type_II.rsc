@@ -28,11 +28,6 @@ public void detectClones() {
 		}
 	};
 	*/
-	
-	// iprintln(ast)
-	loc filename = |project://Software-Evolution/astprettyprint.txt|;
-	writeFile(filename);
-	//iprintToFile(filename, ast);
 }
 alias snip = tuple[ loc location, value code];
 
@@ -50,10 +45,10 @@ set[Declaration] rewriteAST (set[Declaration] ast) {
 		// classes
 		case \class(name, extends, implements, body) => \class(uniformstr, extends, implements, body)
 		// methods
-		case \method(returntype, name, parameters, exceptions, impl) => \method (returntype, uniformstr, parameters, exceptions, impl)
-		case \method(returntype, name, parameters, exceptions) => \method(returntype, uniformstr, parameters, exceptions)
-		case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, uniformstr, arguments)
-    	case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, uniformstr, arguments)
+		case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions, impl)
+		case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions)
+		//case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, uniformstr, arguments)
+    	//case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, uniformstr, arguments)
     	//variables
 		case \variable(name, extraDimensions) => \variable(uniformstr, extraDimensions)
     	case \variable(name,  extraDimensions, init) => variable(uniformstr, extraDimensions, init)
@@ -77,9 +72,6 @@ set[Declaration] rewriteAST (set[Declaration] ast) {
 	};
 	return a;
 }
-
-
-
 
 
 

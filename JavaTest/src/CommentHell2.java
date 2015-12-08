@@ -16,7 +16,7 @@ package testJavaf;''
         
     }
     
-    public float clone() {
+    public float clonetst() {
     	float i = 0;
     	float j = 0; 
     	

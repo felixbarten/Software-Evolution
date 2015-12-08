@@ -17,7 +17,7 @@ package testJava;
     }
     
     
-    public int clone() {
+    public int clonetst() {
     	int i = 0;
     	int j = 0; 
     	
