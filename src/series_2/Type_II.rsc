@@ -15,11 +15,11 @@ public void detectClones() {
 
 	println("Analyzing project <project>");
 	M3 model = createM3FromEclipseProject(project);
-	set[Declaration] ast = createAstsFromEclipseProject(project, true);
+	//set[Declaration] ast = createAstsFromEclipseProject(project, true);
 		
-	ast = rewriteAST(ast);
+	//ast = rewriteAST(ast);
 
-	
+	value result = getDups(project);
 	/*
 	visit(ast) {
 		case \simpleName(_) t : {
@@ -32,8 +32,9 @@ public void detectClones() {
 	// iprintln(ast)
 	loc filename = |project://Software-Evolution/astprettyprint.txt|;
 	writeFile(filename);
-	iprintToFile(filename, ast);
+	//iprintToFile(filename, ast);
 }
+alias snip = tuple[ loc location, value code];
 
 set[Declaration] rewriteAST (set[Declaration] ast) {
 	str uniformstr = "str";
@@ -76,6 +77,124 @@ set[Declaration] rewriteAST (set[Declaration] ast) {
 	};
 	return a;
 }
+public void printLOC (rel[snip, snip] clones){
+	for (tuple[snip, snip] clone <- clones) {
+		iprintln(clone[0][0]);
+		iprintln(clone[1][0]);
+	}
+}
+
+public rel[snip, snip] getDups(loc project) {
+	map[value, rel[loc, value]] m = ();
+	asts =  createAstsFromEclipseProject(project, true);
+	asts = rewriteAST(asts);
+	rel[snip, snip] clonePairs = {};
+	int subTreeSizeThreshold = 6;	
+	real similarityThreshold = 0.5;
+
+	void addSubtreeToMap(subtree){
+				loc source = |project://testJava|;
+				
+				try{
+					switch(subtree){
+						case Declaration a:	source = a@src;
+						case Statement a:	source = a@src;
+						case Expression a:	source = a@src;
+						case Modifier a:	source = a@src;
+					}
+				} catch: iprintln("No src annotation at <subtree> \n");	
+
+				if(m[subtree]?){
+					m[subtree] += <source, subtree>;
+				} else {
+				    rel[loc, value] b = {<source, subtree>};
+					m[subtree] = b;
+				}
+	}
+	
+
+	bottom-up visit(asts) {
+		case node a:{
+			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
+				addSubtreeToMap(a);
+			}
+		}
+	 }
+	 	
+	 void removeExistingSubtree(ast){
+		bottom-up visit(ast.code) {
+			case node subtree:{
+					clonePairs = {< l, r> | < snip l,snip  r> <-clonePairs, r.code != subtree,l.code != subtree}; 
+			}
+		}
+	 }
+
+	buckets = range(m);
+
+	for(bucket <- buckets, size(bucket) > 1){
+		for(tuple[snip first, snip second] pair <- bucket * bucket , pair.first != pair.second, calcSimularity(pair.first.code,pair.second.code) >= similarityThreshold){
+			removeExistingSubtree(pair.first);
+			removeExistingSubtree(pair.second);
+			clonePairs += pair;
+		}
+	}
+	
+	iprintln(size(clonePairs));
+
+	for(<l,r> <- clonePairs){
+		if(l == r){
+			iprintln("fuck");
+		}
+	}
+	printLOC(clonePairs);
+	
+	return clonePairs;	
+}
+
+int calcSubtreeSize(node n){
+	int size = 0;
+	visit (n){
+		case node child:{
+			 size += 1;
+		}	
+	}
+	return size;
+} 
+
+//2xS/(2xS+L+R)
+real calcSimularity(node l, node r){
+	set[node] left = treeToSet(l);
+	set[node] right = treeToSet(r);
+
+	real nShared = toReal(size(left & right));
+	real dNodesL = toReal(size(left)- nShared);
+	real dNodesR = toReal(size(right) - nShared);
+
+	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
+}
+set[node] treeToSet(node t){
+	set[node] r = {};
+
+	visit(t){
+		case node x:{
+			r += x;	
+		}	
+	}
+	return r;
+}
+
+
+
+
+
+
+
+
+
+
+// TESTS
+
+
 test bool rewriteVariable() {
 	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
 	
