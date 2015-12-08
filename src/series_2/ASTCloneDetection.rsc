@@ -6,11 +6,11 @@ import lang::java::jdt::m3::AST;
 import lang::java::m3::AST;
 import lang::java::m3::Core;
 import util::Math;
+import DateTime;
 import series_2::Type_II;
 
 
 alias snip = tuple[ loc location, value code];
-public set[node] asts = {};
 
 
 private set[Declaration] normalizeAst(set[Declaration] ast){
@@ -29,16 +29,27 @@ public void printSnips (rel[snip, snip] clones){
 	}
 }
 
-public rel[snip, snip] getDups(loc project) {
+ loc getUnknownLoc() { 
+ 	loc unknown = |unknown:///|;
+	unknown = unknown[offset =1];
+	unknown = unknown[length = 1];
+	unknown = unknown[begin=<1,1>];
+	unknown = unknown[end=<11,1>];
+	return unknown;
+ }
+
+ public rel[snip, snip] getDups(loc project) {
+
+	datetime beginTime = now();
 	map[value, rel[loc, value]] m = ();
-	asts =  rewriteAST(createAstsFromEclipseProject(project, true));
+	set[node] asts = rewriteAST(createAstsFromEclipseProject(project, true));
+	iprintln(" size: <size(asts)>");
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 10;	
-	real similarityThreshold = 0.5;
+	int subTreeSizeThreshold = 6;	
+	real similarityThreshold = 0.6;
 
 	void addSubtreeToMap(subtree){
 		loc source;
-		
 		try{
 			switch(subtree){
 				case Declaration a:	source = a@src;
@@ -46,17 +57,18 @@ public rel[snip, snip] getDups(loc project) {
 				case Expression a:	source = a@src;
 				case Modifier a:	source = a@src;
 			}
-		} catch: source = |unknown:///|;	
-
-		if(m[subtree]?){
-			m[subtree] += <source, subtree>;
-		} else {
-			rel[loc, value] b = {<source, subtree>};
-			m[subtree] = b;
+		} catch: source = getUnknownLoc(); //The element had no src annotation
+			
+		if(source.end.line - source.begin.line  > 6){ //ignore all subtrees to aren't spread over 6 lines
+			if(m[subtree]?){
+				m[subtree] += <source, subtree>;
+			} else {
+				m[subtree] = {<source, subtree>};
+			}
 		}
 	}
 
-	bottom-up visit(asts) {
+	visit(asts) {
 		case node a:{
 			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
 				addSubtreeToMap(a);
@@ -65,11 +77,11 @@ public rel[snip, snip] getDups(loc project) {
 	 }
 	
 	 void removeExistingSubtree(ast){
-		bottom-up visit(ast.code) {
+		visit(ast.code) {
 			case node subtree:{
-					if(ast.code != subtree){
-					clonePairs = {< l, r> | < snip l,snip  r> <-clonePairs, r.code != subtree,l.code != subtree}; 
-					}
+				if(ast.code != subtree){ //Keep ourselves in just in case
+					clonePairs = {<l, r> | < snip l,snip r> <-clonePairs, r.code != subtree,l.code != subtree}; 
+				}
 			}
 		}
 	 }
@@ -84,20 +96,24 @@ public rel[snip, snip] getDups(loc project) {
 		}
 	}
 	
-	iprintln(size(clonePairs));
-	
+	str pDur(Duration duration){
+	 return durationStr = "Total calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	}	
+	iprintln("Found clones: <size(clonePairs)>");	
+	iprintln("Execution time: <pDur(createDuration(beginTime, now()))>"); 	
 	return clonePairs;	
 }
 
+
 set[node] treeToSet(node t){
-	set[node] r = {};
+	set[node] nodes = {};
 
 	visit(t){
 		case node x:{
-			r += x;	
+			nodes += x;	
 		}	
 	}
-	return r;
+	return nodes;
 }
 
 //2xS/(2xS+L+R)
