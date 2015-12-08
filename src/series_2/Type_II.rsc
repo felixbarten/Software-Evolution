@@ -80,21 +80,18 @@ test bool rewriteVariable() {
 	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
 	
 	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
 	return (AST != rewritten);
 }
 test bool rewriteName() {
 	set[Declaration] AST = {\vararg(lang::java::jdt::m3::AST::long(), "")};
 	
 	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
 	return (AST != rewritten);
 }
 test bool rewriteModifier() {
 	set[Declaration] AST = {\class([\vararg(lang::java::jdt::m3::AST::long(), "")])[@modifiers=[lang::java::jdt::m3::AST::\private()]]};
 	
 	rewritten = rewriteAST(AST);
-	iprintln(rewritten);
 	return (AST != rewritten);
 }
 
@@ -104,8 +101,6 @@ test bool rewriteLiteralBool() {
 	visit(rewritten) {
 		case \booleanLiteral(val): return val == true;
 	};
-	
-	iprintln(rewritten);
 	return (AST != rewritten);
 }
 
