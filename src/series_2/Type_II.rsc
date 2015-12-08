@@ -16,9 +16,7 @@ public void detectClones() {
 	println("Analyzing project <project>");
 	M3 model = createM3FromEclipseProject(project);
 	set[Declaration] ast = createAstsFromEclipseProject(project, true);
-	
-	//iprintln(ast);
-	
+		
 	ast = rewriteAST(ast);
 
 	
@@ -60,18 +58,43 @@ test bool rewriteModifier() {
 }
 
 set[Declaration] rewriteAST (set[Declaration] ast) {
-	str unifiedname = "detectthis";
+	str uniformstr = "t2";
+	bool uniformbool = true;
+	str uniformchar = "c";
+	str uniformint = "1";
+	
 	a = visit(ast) {
 		//case unionType(_) => unionType([short()])
 		case Type _ => lang::java::jdt::m3::AST::short() 
 		case Modifier _ => lang::java::jdt::m3::AST::\private()
-		case \simpleName(_) => \simpleName(unifiedname)
-		case \method(returntype, name, parameters, exceptions, impl) => \method (returntype, unifiedname, parameters, exceptions, impl)
-		case \method(returntype, name, parameters, exceptions) => \method(returntype, unifiedname, parameters, exceptions)
-		case \class(name, extends, implements, body) => \class(unifiedname, extends, implements, body)
-		
-		case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, unifiedname, arguments)
-    	case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, unifiedname, arguments)
+		case \simpleName(_) => \simpleName(uniformstr)
+		// classes
+		case \class(name, extends, implements, body) => \class(uniformstr, extends, implements, body)
+		// methods
+		case \method(returntype, name, parameters, exceptions, impl) => \method (returntype, uniformstr, parameters, exceptions, impl)
+		case \method(returntype, name, parameters, exceptions) => \method(returntype, uniformstr, parameters, exceptions)
+		case \methodCall(isSuper, name, arguments) => \methodCall(isSuper, uniformstr, arguments)
+    	case \methodCall(isSuper, receiver, name, arguments) => \methodCall(isSuper, receiver, uniformstr, arguments)
+    	//variables
+		case \variable(name, extraDimensions) => \variable(uniformstr, extraDimensions)
+    	case \variable(name,  extraDimensions, init) => variable(uniformstr, extraDimensions, init)
+    	// literals
+    	case \booleanLiteral(boolValue) => \booleanLiteral(uniformbool)
+   		case \stringLiteral(stringValue) => \stringLiteral(uniformstr)
+        case \characterLiteral(charValue) => \characterLiteral(uniformchar)
+        case \number(numVal) => \number(uniformint)
+    
+    	
+    	/*
+    	case node n : {
+    		if(n@typ?){ 
+    			println("type found");
+    		}
+    		if(n@modifiers?){ 
+    			println("modifier found");
+    		}
+    	}
+    	*/
 	};
 	return a;
 }
