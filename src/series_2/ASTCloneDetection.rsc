@@ -6,6 +6,7 @@ import lang::java::jdt::m3::AST;
 import lang::java::m3::AST;
 import lang::java::m3::Core;
 import util::Math;
+import series_2::Type_II;
 
 
 alias snip = tuple[ loc location, value code];
@@ -19,33 +20,41 @@ private set[Declaration] normalizeAst(set[Declaration] ast){
 	}
 }
  
+public void printSnips (rel[snip, snip] clones){
+	for (tuple[snip, snip] clone <- clones) {
+		iprintln("");	
+		iprint(clone[0].location);
+		iprint(" - "); 
+		iprint(clone[1].location);
+	}
+}
+
 public rel[snip, snip] getDups(loc project) {
 	map[value, rel[loc, value]] m = ();
-	asts =  createAstsFromEclipseProject(project, true);
+	asts =  rewriteAST(createAstsFromEclipseProject(project, true));
 	rel[snip, snip] clonePairs = {};
 	int subTreeSizeThreshold = 6;	
 	real similarityThreshold = 0.5;
 
 	void addSubtreeToMap(subtree){
-				loc source = |project://testJava|;
-				
-				try{
-					switch(subtree){
-						case Declaration a:	source = a@src;
-						case Statement a:	source = a@src;
-						case Expression a:	source = a@src;
-						case Modifier a:	source = a@src;
-					}
-				} catch: iprintln("No src annotation at <subtree> \n");	
+		loc source = |project://testJava|;
+		
+		try{
+			switch(subtree){
+				case Declaration a:	source = a@src;
+				case Statement a:	source = a@src;
+				case Expression a:	source = a@src;
+				case Modifier a:	source = a@src;
+			}
+		} catch: iprintln("No src annotation at <subtree> \n");	
 
-				if(m[subtree]?){
-					m[subtree] += <source, subtree>;
-				} else {
-				    rel[loc, value] b = {<source, subtree>};
-					m[subtree] = b;
-				}
+		if(m[subtree]?){
+			m[subtree] += <source, subtree>;
+		} else {
+			rel[loc, value] b = {<source, subtree>};
+			m[subtree] = b;
+		}
 	}
-	
 
 	bottom-up visit(asts) {
 		case node a:{
@@ -74,12 +83,6 @@ public rel[snip, snip] getDups(loc project) {
 	}
 	
 	iprintln(size(clonePairs));
-
-	for(<l,r> <- clonePairs){
-		if(l == r){
-			iprintln("fuck");
-		}
-	}
 	
 	return clonePairs;	
 }
