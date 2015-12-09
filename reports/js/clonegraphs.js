@@ -22,8 +22,8 @@
 		  chart.tooltip.gravity("n");
 		  chart.tooltip.position({"top": 200, "left": 500});
 		  chart.tooltip.contentGenerator(function(data) {
-	      		var modifiedkey = data.data.clone1 + " lines" + data.data.begin1 + "-" + data.data.end1 + " and " + data.data.clone2 + " lines:" + data.data.begin2 + "-" + data.data.end2;
-	      		return "<h3> " + modifiedkey + "</h3>" + "<p> " + data.data.value + "Lines of Code</p>";
+	      		var modifiedkey = data.data.clone1 + " lines: " + data.data.begin1 + "-" + data.data.end1 + "</br> and " + data.data.clone2 + " lines: " + data.data.begin2 + "-" + data.data.end2;
+	      		return "<b> " + modifiedkey + "</b>" + "<p> " + data.data.value + "Lines of Code</p>";
 	      });
 	
 	  d3.select('#barchart svg')
