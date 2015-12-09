@@ -113,14 +113,19 @@ public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 		// remove huge leaders to locations 
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
+		str authority = project.authority;
 		
-		index1 = findLast(clone1, project.path);
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
 		if (index1 != -1){
-			clone1 = substring(clone1, index1); 
+			clone1 = substring(clone1, (index1 + size(authority))); 
 		}
-		
-		values += "\t\t\"clone1\": \"<pair.first.location.path>\",\n";
-		values += "\t\t\"clone2\": \"<pair.second.location.path>\"\n";
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
 		values += "\t},\n";
 	}
 	// delete trailing ,
