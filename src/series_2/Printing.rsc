@@ -83,24 +83,15 @@ public void printMatrixGraph(rel[snip, snip] clonepairs) {
 	loc JSON = |project://Software-Evolution/reports/json/matrix.json|;
 }
 
-public void printChordDiagram(rel[snip, snip] clonepairs, loc file) {
+public void printChordDiagram(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/chordgraph.json|;
-	startJSON(JSON);
-	// insert key and values
-	appendToFile
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n");
+	// insert key and value
 	
 	values = "";
 	// sort data 
 	for (tuple[snip first, snip second] pair <- clonepairs){
-		values += "\t{\n";
-		values += "\t\t\"name\": \"<pair.first.location.authority>\",\n";
-		lines =  pair.first.location.end.line - pair.first.location.begin.line;
-		values += "\t\t\"size\": <lines>,\n";
-		values += "\t\t\"imports\": <pair.second.location.authority>,\n";
-		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
-		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
-		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
-		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
 		// remove huge leaders to locations 
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
@@ -114,19 +105,27 @@ public void printChordDiagram(rel[snip, snip] clonepairs, loc file) {
 		}
 		if (index1 != -1){
 			clone2 = substring(clone2, (index2 + size(authority))); 
-		}		
+		}
+
+		values += "\t{\n";
+		values += "\t\t\"name\": \"<clone1>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"size\": <lines>,\n";
+		values += "\t\t\"imports\": [ \"<clone2>\"],\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
 		values += "\t\t\"clone1\": \"<clone1>\",\n";
 		values += "\t\t\"clone2\": \"<clone2>\"\n";
 		values += "\t},\n";
 	}
 	// delete trailing ,
-	values = values[..-1];
-	
+	values = values[..-2];
+	values += "\n";
 	// write values 
 	appendToFile(JSON, values);
 	appendToFile(JSON, "]");
-	// end json file
-	endJSON(JSON);
 }
 
 public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {

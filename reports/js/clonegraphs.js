@@ -148,13 +148,14 @@ var arc = d3.svg.arc()
     .innerRadius(r0)
     .outerRadius(r0 + 20);
 
-var svg = d3.select("#body").append("svg:svg")
+var svg = d3.select("#chordchart").append("svg:svg")
     .attr("width", w)
     .attr("height", h)
   .append("svg:g")
     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
-d3.json("flare-imports.json", function(imports) {
+d3.json("json/chordgraph.json", function(imports) {
+	console.log(imports);
   var indexByName = {},
       nameByIndex = {},
       matrix = [],
