@@ -84,9 +84,49 @@ public void printMatrixGraph(rel[snip, snip] clonepairs) {
 }
 
 public void printChordDiagram(rel[snip, snip] clonepairs, loc file) {
-	loc JSON = |project://Software-Evolution/reports/json/chordgraph.js|;
+	loc JSON = |project://Software-Evolution/reports/json/chordgraph.json|;
 	startJSON(JSON);
+	// insert key and values
+	appendToFile
 	
+	values = "";
+	// sort data 
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		values += "\t{\n";
+		values += "\t\t\"name\": \"<pair.first.location.authority>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"size\": <lines>,\n";
+		values += "\t\t\"imports\": <pair.second.location.authority>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	// delete trailing ,
+	values = values[..-1];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+	endJSON(JSON);
 }
 
 public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
