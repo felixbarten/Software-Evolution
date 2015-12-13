@@ -1,4 +1,28 @@
-	//var data = projects[project];
+function stripProjectName(name) {
+    var origname = name;
+    if (name.substring(0,8) == "smallsql") {
+      name = name.substring(8, name.length);
+    }
+    if (name.substring(0,8) == "JavaTest") {
+      name = name.substring(8, name.length);
+    }
+    if (name.substring(0,9) == "JavaTest2") {
+      name = name.substring(9, name.length);
+
+    }
+    if (name.substring(0,6) == "hsqldb") {
+      name = name.substring(6, name.length);
+    }
+
+    if (origname != name) {
+        name = ".." + name;    
+    }
+    return name;
+
+}
+
+
+  //var data = projects[project];
 	//console.log(project);
 	//console.log(data);	// returned object in screenshot
 	
@@ -34,8 +58,8 @@
 	});
 	
 
-// Chored graph 
-/*
+// Chord graph 
+
 var w = 1280,
     h = 800,
     r1 = h / 2,
@@ -55,7 +79,7 @@ var arc = d3.svg.arc()
 var svg = d3.select("#chord svg")
     .attr("width", w)
     .attr("height", h)
-  .append("svg:g")
+    .append("svg:g")
     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
 d3.json("json/chordgraph.json", function(imports) {
@@ -66,9 +90,9 @@ d3.json("json/chordgraph.json", function(imports) {
 
   self.names = [];
 
-  // Returns the Flare package name for the given class name.
+// JS hack to get shorter names.
   function name(name) {
-    return name.substring(0, name.lastIndexOf(".")).substring(6);
+    return stripProjectName(name);
   }
 
   // Compute a unique index for each package name.
@@ -137,7 +161,7 @@ function fade(opacity) {
         .style("fill-opacity", opacity);
   };
 }
-*/
+
 
 
 // get the data

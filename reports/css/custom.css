@@ -13,8 +13,10 @@ p .tooltip {
 	font-size: 10px;
 }
 
-#chordchart svg {
-	height: 2000px;
+#chord svg {
+	height: 1300px;
+	width: 1300px;
+
 }
 
 .chord path {
