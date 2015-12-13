@@ -104,6 +104,7 @@ public void printSnips (rel[snip, snip] clones){
 	
 	printSnipsToFile(clonePairs, report);
 	printBarGraph(clonePairs, report, project);
+	printBarGraph2(clonePairs, report, project);
 	printChordDiagram(clonePairs, report, project);
 	printForceGraph(clonePairs, report, project);
 	
