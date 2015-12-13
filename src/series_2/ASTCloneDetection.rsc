@@ -10,6 +10,7 @@ import series_2::misc::util;
 import series_2::misc::datatypes;
 import DateTime;
 import series_2::Type_II;
+import series_2::Printing;
 
 
 public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
@@ -20,9 +21,11 @@ public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
 }
 
  public rel[snip, snip] getDups(loc project) {
+	loc report = startReport(project);
 	datetime beginTime = now();
 	map[value, rel[loc, value]] m = ();
 	set[node] asts = createAstsFromEclipseProject(project, false);
+
 	rel[snip, snip] clonePairs = {};
 	int subtreeWeightThreshold = 25;	
 	real similarityThreshold = 0.7;
@@ -50,6 +53,18 @@ public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
 	iprintln("Total clone pairs found: <size(clonePairs)>");	
 	iprintln("Execution time: <showDuration(createDuration(beginTime, now()))>"); 	
 	//iprintln(getCloneClasses(clonePairs));
+	
+	
+	printSnipsToFile(clonePairs, report);
+	printBarGraph(clonePairs, report, project);
+	printBarGraph2(clonePairs, report, project);
+	printChordDiagram(clonePairs, report, project);
+	printForceGraph(clonePairs, report, project);
+	printCodeClones(clonePairs, report, project);
+	
+	Duration execution = createDuration(beginTime, now());
+	printProjectExecutionTime(execution, report); 	
+	endReport(report);
 	return clonePairs;	
 }
 
