@@ -275,7 +275,6 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
-	appendToFile(JSON, "[\n");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
 	values = "";
 
@@ -300,25 +299,29 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, "[\n");
 	
 	for (key <- clonemap) {
-		values += "\t{";
-		values += "\t\"clone\": \"<key>\"";
+		values += "\t{\n";
+		values += "\t\t\"clone\": \"<key>\",\n";
 		
 		clonevalue = clonemap[key];
-		values += "\"clones\": [";
+		values += "\t\t\"clones\": [";
 		
 		for (langenaam <- clonevalue) {
-			for (list[str] lst <- langenaam {
+			for (list[str] lst <- langenaam) {
+				values += "\t\t\t: [";
+				
 				for (str val <- lst) {
 					///iprintln(langenaam);
-					langenaam = escape(langenaam[0], ("\"": "\""));
-					values += "\"<langenaam>\",\n";
+					val = escape(val, ("\"": "\""));
+					values += "\"<val>\",\n";
 				}
+				values += "\t\t\t]";
+
 			}
 		}
 		values = values[..-2];
-		values += "\t\t]";
+		values += "\t\t\t]\n";
 		
-		values += "\t\t}";
+		values += "\t\t},\n";
 		
 	}
 	appendToFile(JSON, "]\n");
