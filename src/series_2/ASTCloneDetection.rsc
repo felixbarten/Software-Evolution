@@ -6,110 +6,92 @@ import lang::java::jdt::m3::AST;
 import lang::java::m3::AST;
 import lang::java::m3::Core;
 import util::Math;
+import series_2::misc::util;
+import series_2::misc::datatypes;
 import DateTime;
 import series_2::Type_II;
 
 
-alias snip = tuple[ loc location, value code];
-
-
-private set[Declaration] normalizeAst(set[Declaration] ast){
-	visit(ast){
-	//	case \type(_) => \type(\int())
-	default: ;
-	}
+public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
+    temp = pairs+;
+	temp += ident(carrier(temp)); 
+	temp += invert(temp);
+	return determineEquivalenceClasses(temp);	
 }
- 
-public void printSnips (rel[snip, snip] clones){
-	for (tuple[snip, snip] clone <- clones) {
-		iprintln("");	
-		iprint(clone[0].location);
-		iprint(" - "); 
-		iprint(clone[1].location);
-	}
-}
-
- loc getUnknownLoc() { 
- 	loc unknown = |unknown:///|;
-	unknown = unknown[offset =1];
-	unknown = unknown[length = 1];
-	unknown = unknown[begin=<1,1>];
-	unknown = unknown[end=<11,1>];
-	return unknown;
- }
 
  public rel[snip, snip] getDups(loc project) {
-
 	datetime beginTime = now();
 	map[value, rel[loc, value]] m = ();
-	set[node] asts = rewriteAST(createAstsFromEclipseProject(project, true));
-	iprintln(" size: <size(asts)>");
+	set[node] asts = createAstsFromEclipseProject(project, false);
 	rel[snip, snip] clonePairs = {};
-	int subTreeSizeThreshold = 6;	
-	real similarityThreshold = 0.6;
+	int subtreeWeightThreshold = 25;	
+	real similarityThreshold = 0.7;
 
-	void addSubtreeToMap(subtree){
-		loc source;
-		try{
-			switch(subtree){
-				case Declaration a:	source = a@src;
-				case Statement a:	source = a@src;
-				case Expression a:	source = a@src;
-				case Modifier a:	source = a@src;
-			}
-		} catch: source = getUnknownLoc(); //The element had no src annotation
-			
-		if(source.end.line - source.begin.line  > 6){ //ignore all subtrees to aren't spread over 6 lines
-			if(m[subtree]?){
-				m[subtree] += <source, subtree>;
-			} else {
-				m[subtree] = {<source, subtree>};
-			}
-		}
-	}
-
+	
 	visit(asts) {
 		case node a:{
-			if( calcSubtreeSize(a) >= subTreeSizeThreshold){
-				addSubtreeToMap(a);
-			}
-		}
-	 }
-	
-	 void removeExistingSubtree(ast){
-		visit(ast.code) {
-			case node subtree:{
-				if(ast.code != subtree){ //Keep ourselves in just in case
-					clonePairs = {<l, r> | < snip l,snip r> <-clonePairs, r.code != subtree,l.code != subtree}; 
-				}
+			if(calcSubtreeSize(a) >= subtreeWeightThreshold){
+				m = addSubtreeToMap(a,m);
 			}
 		}
 	 }
 
 	buckets = range(m);
 
-	for(bucket <- buckets, size(bucket) > 1){
-		for(tuple[snip first, snip second] pair <- bucket * bucket , pair.first != pair.second, calcSimularity(pair.first.code,pair.second.code) >= similarityThreshold){
-			removeExistingSubtree(pair.first);
-			removeExistingSubtree(pair.second);
+	for(bucket <- range(m), size(bucket) > 1){
+		for(tuple[snip first, snip second] pair <- sort(bucket * bucket) , pair.first != pair.second, calcSimularity(pair.first.code, pair.second.code) >= similarityThreshold){
+			clonePairs = removeExistingSubtrees(pair.first.code,clonePairs);
+			clonePairs = removeExistingSubtrees(pair.second.code,clonePairs);
 			clonePairs += pair;
 		}
 	}
-	
-	str pDur(Duration duration){
-	 return durationStr = "Total calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
-	}	
-	iprintln("Found clones: <size(clonePairs)>");	
-	iprintln("Execution time: <pDur(createDuration(beginTime, now()))>"); 	
+    
+    //iprintln(getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- clonePairs)));
+	iprintln("Total clone pairs found: <size(clonePairs)>");	
+	iprintln("Execution time: <showDuration(createDuration(beginTime, now()))>"); 	
+	//iprintln(getCloneClasses(clonePairs));
 	return clonePairs;	
 }
 
+map[value, rel[loc, value]] addSubtreeToMap(subtree, map[value, rel[loc, value]] m){
+    loc source;
+    try{
+        switch(subtree){
+            case Declaration a: source = a@src;
+            case Statement a: source = a@src;
+            case Expression a: source = a@src;
+            case Modifier a: source = a@src;
+            case node _: source = getUnknownLoc();
+        }
+    } catch: source = getUnknownLoc(); //The element had no src annotation
 
-set[node] treeToSet(node t){
-	set[node] nodes = {};
+    if(source.end.line - source.begin.line > 2){ //ignore all subtrees that aren't spread over multiple lines
+        rewrittenTree = rewriteAST(subtree);
+        if(m[rewrittenTree]?){
+            m[rewrittenTree] += <source, subtree>;
+        } else {
+            m[rewrittenTree] = {<source, subtree>};
+        }
+    }
+    return m;
+}
+
+ rel[snip,snip] removeExistingSubtrees(ast, rel[snip,snip] clonePairs){
+    visit(ast) {
+        case node subtree:{
+            if(subtree != ast){
+               clonePairs -= {<l,r> | <snip l, snip r> <-clonePairs, r.code == subtree || l.code == subtree}; 
+            }
+        }
+    }
+    return clonePairs;
+ }
+
+set[value] treeToSet(value t){
+	set[value] nodes = {};
 
 	visit(t){
-		case node x:{
+		case value x:{
 			nodes += x;	
 		}	
 	}
@@ -117,16 +99,35 @@ set[node] treeToSet(node t){
 }
 
 //2xS/(2xS+L+R)
-real calcSimularity(node l, node r){
-	set[node] left = treeToSet(l);
-	set[node] right = treeToSet(r);
+real calcSimularity(value l, value r){
+	set[value] left = treeToSet(l);
+	set[value] right = treeToSet(r);
 
 	real nShared = toReal(size(left & right));
-	real dNodesL = toReal(size(left)- nShared);
-	real dNodesR = toReal(size(right) - nShared);
+	real dNodesL = toReal(size(left - right));
+	real dNodesR = toReal(size(right - left));
 
 	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
 }
+
+bool areType3Clones(a, b){
+    aSize = size(a);
+    bSize = size(b); 
+    if(!(aSize - bSize < 3 || bSize - aSize < 3)){
+       return false;
+    }
+    return calcSimularity(a,b) > similarityThreshold; 
+}  
+
+int calcSubtreeSize(value n){
+	int size = 0;
+    visit (n){
+        case node child:{
+             size += 1;
+        }	
+    }
+	return size;
+} 
 
 int calcSubtreeSize(node n){
 	int size = 0;
@@ -159,7 +160,7 @@ test bool calcSimilarityTest1(node b){
 
 test bool calcSimilarityTest2(){
 	node a = makeNode("a", "1");
-	node b = makeNode("b", "1");
+	node b = makeNode("b", "2");
 	return calcSimularity(a,b) == 0.0;	
 }
 
