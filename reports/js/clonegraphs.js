@@ -122,8 +122,10 @@ d3.json("json/chordgraph.json", function(imports) {
       .data(chord.groups)
     .enter().append("svg:g")
       .attr("class", "group")
-      .on("mouseover", fade(.02))
-      .on("mouseout", fade(.80));
+//      .on("mouseover", fade(.02))
+//      .on("mouseout", fade(.80));
+        .on("mouseover", mouseover)
+        .on("mouseout", function (d) { d3.select("#tooltip").style("visibility", "hidden") });
 
   g.append("svg:path")
       .style("stroke", function(d) { return fill(d.index); })
@@ -141,15 +143,13 @@ d3.json("json/chordgraph.json", function(imports) {
       })
       .text(function(d) { return nameByIndex[d.index]; });
 
-  svg.selectAll("path.chord")
+  var chordPaths = svg.selectAll("path.chord")
       .data(chord.chords)
     .enter().append("svg:path")
       .attr("class", "chord")
       .style("stroke", function(d) { return d3.rgb(fill(d.source.index)).darker(); })
       .style("fill", function(d) { return fill(d.source.index); })
       .attr("d", d3.svg.chord().radius(r0));
-
-});
 
 // Returns an event handler for fading a given chord group.
 function fade(opacity) {
@@ -162,6 +162,52 @@ function fade(opacity) {
   };
 }
 
+function mouseover(d, i) {
+  console.log(d);
+  console.log(i);
+            d3.select("#tooltip")
+              .style("visibility", "visible")
+              .html("<h2> hi</h2>")
+              .style("top", function () { return (d3.event.pageY - 80)+"px"})
+              .style("left", function () { return (d3.event.pageX - 130)+"px";})
+
+    chordPaths.classed("fade", function(p) {
+              return p.source.index != i
+                  && p.target.index != i;
+    });
+  }
+
+});
+
+
+          function groupTip (d) {
+            var guru = d.gname, q = d3.format("0d");
+
+            switch (guru) {
+              case "g1": return "Guru Nanak"; //+ " lived for 70 years";
+                  break;
+              case "g2": return "Guru Angad"; // + " lived for 48 years";
+                  break;
+              case "g3": return "Guru Amar Das"; // + " lived for 95 years";
+                  break;
+              case "g4": return "Guru Ram Das"; // + " lived for 47 years";
+                  break;
+              case "g5": return "Guru Arjun Dev"; // + " lived for 43 years";
+                  break;
+              case "g6": return "Guru Har Gobind"; // + " lived for 49 years";
+                  break;
+              case "g7": return "Guru Har Rai"; // + " lived for 31 years";
+                  break;
+              case "g8": return "Guru Har Krishan"; // + " lived for 8 years";
+                  break;
+              case "g9": return "Guru Tegh Bahadar"; // + " lived for 54 years";
+                  break;
+              case "g10": return "Guru Gobind Singh"; // + " lived for 42 years";
+                  break;
+              default : return d.gname;
+
+            }
+          }
 
 
 // get the data

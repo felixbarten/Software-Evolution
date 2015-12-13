@@ -24,6 +24,20 @@ p .tooltip {
   stroke: #000;
   stroke-width: .5px;
 }
+      #tooltip {
+        color: #454545;
+        opacity: .9;
+        background: #eee;
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        position: absolute;
+        z-index: 10;
+        visibility: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
 
 
 # force graph
@@ -35,4 +49,8 @@ p .tooltip {
 .link {
   stroke: #999;
   stroke-opacity: .6;
+}
+
+#circle:hover path.fade {
+    display: none;
 }
