@@ -84,6 +84,52 @@ public void printMatrixGraph(rel[snip, snip] clonepairs) {
 }
 
 public void printChordDiagram(rel[snip, snip] clonepairs, loc file, loc project) {
+	loc JSON = |project://Software-Evolution/reports/json/forcegraph.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n");
+	// insert key and value
+	
+	values = "";
+	// sort data 
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}
+
+		values += "\t{\n";
+		values += "\t\t\"name\": \"<clone1>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <lines>,\n";
+		values += "\t\t\"imports\": [ \"<clone2>\"],\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"source\": \"<clone1>\",\n";
+		values += "\t\t\"target\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	// delete trailing ,
+	values = values[..-2];
+	values += "\n";
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+}
+
+public void printForceGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/chordgraph.json|;
 	writeFile(JSON, "");
 	appendToFile(JSON, "[\n");
@@ -96,6 +142,7 @@ public void printChordDiagram(rel[snip, snip] clonepairs, loc file, loc project)
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
 		str authority = project.authority;
+		authority += "/src/";
 		
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);

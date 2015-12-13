@@ -19,8 +19,6 @@
 	      
 	      //chart.interactiveLayer.enabled(true);
 		  chart.tooltip.enabled(true);        //Don't show tooltips
-		  chart.tooltip.gravity("n");
-		  chart.tooltip.position({"top": 200, "left": 500});
 		  chart.tooltip.contentGenerator(function(data) {
 	      		var modifiedkey = data.data.clone1 + " lines: " + data.data.begin1 + "-" + data.data.end1 + "</br> and " + data.data.clone2 + " lines: " + data.data.begin2 + "-" + data.data.end2;
 	      		return "<b> " + modifiedkey + "</b>" + "<p> " + data.data.value + "Lines of Code</p>";
@@ -36,102 +34,8 @@
 	});
 	
 
+// Chored graph 
 /*
-
-// From http://mkweb.bcgsc.ca/circos/guide/tables/
-var matrix = [
-  [11975,  5871, 8916, 2868],
-  [ 1951, 10048, 2060, 6171],
-  [ 8010, 16145, 8090, 8045],
-  [ 1013,   990,  940, 6907]
-];
-
-var chord = d3.layout.chord()
-    .padding(.05)
-    .sortSubgroups(d3.descending)
-    .matrix(matrix);
-
-var width = 960,
-    height = 500,
-    innerRadius = Math.min(width, height) * .41,
-    outerRadius = innerRadius * 1.1;
-
-var fill = d3.scale.ordinal()
-    .domain(d3.range(4))
-    .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-  .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-svg.append("g").selectAll("path")
-    .data(chord.groups)
-  .enter().append("path")
-    .style("fill", function(d) { return fill(d.index); })
-    .style("stroke", function(d) { return fill(d.index); })
-    .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-    .on("mouseover", fade(.1))
-    .on("mouseout", fade(1));
-
-var ticks = svg.append("g").selectAll("g")
-    .data(chord.groups)
-  .enter().append("g").selectAll("g")
-    .data(groupTicks)
-  .enter().append("g")
-    .attr("transform", function(d) {
-      return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-          + "translate(" + outerRadius + ",0)";
-    });
-
-ticks.append("line")
-    .attr("x1", 1)
-    .attr("y1", 0)
-    .attr("x2", 5)
-    .attr("y2", 0)
-    .style("stroke", "#000");
-
-ticks.append("text")
-    .attr("x", 8)
-    .attr("dy", ".35em")
-    .attr("transform", function(d) { return d.angle > Math.PI ? "rotate(180)translate(-16)" : null; })
-    .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-    .text(function(d) { return d.label; });
-
-svg.append("g")
-    .attr("class", "chord")
-  .selectAll("path")
-    .data(chord.chords)
-  .enter().append("path")
-    .attr("d", d3.svg.chord().radius(innerRadius))
-    .style("fill", function(d) { return fill(d.target.index); })
-    .style("opacity", 1);
-
-// Returns an array of tick angles and labels, given a group.
-function groupTicks(d) {
-  var k = (d.endAngle - d.startAngle) / d.value;
-  return d3.range(0, d.value, 1000).map(function(v, i) {
-    return {
-      angle: v * k + d.startAngle,
-      label: i % 5 ? null : v / 1000 + "k"
-    };
-  });
-}
-
-// Returns an event handler for fading a given chord group.
-function fade(opacity) {
-  return function(g, i) {
-    svg.selectAll(".chord path")
-        .filter(function(d) { return d.source.index != i && d.target.index != i; })
-      .transition()
-        .style("opacity", opacity);
-  };
-}
-*/
-
-
-
 var w = 1280,
     h = 800,
     r1 = h / 2,
@@ -148,14 +52,13 @@ var arc = d3.svg.arc()
     .innerRadius(r0)
     .outerRadius(r0 + 20);
 
-var svg = d3.select("#chordchart").append("svg:svg")
+var svg = d3.select("#chord svg")
     .attr("width", w)
     .attr("height", h)
   .append("svg:g")
     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
 d3.json("json/chordgraph.json", function(imports) {
-	console.log(imports);
   var indexByName = {},
       nameByIndex = {},
       matrix = [],
@@ -234,3 +137,83 @@ function fade(opacity) {
         .style("fill-opacity", opacity);
   };
 }
+*/
+
+
+// get the data
+d3.json("json/forcegraph.json", function(error, links) {
+
+var nodes = {};
+
+// Compute the distinct nodes from the links.
+links.forEach(function(link) {
+    link.source = nodes[link.source] || 
+        (nodes[link.source] = {name: link.source});
+    link.target = nodes[link.target] || 
+        (nodes[link.target] = {name: link.target});
+    link.value = +link.value;
+});
+
+var width = 960,
+    height = 500;
+
+var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(200)
+    .charge(-300)
+    .on("tick", tick)
+    .start();
+
+var svg = d3.select("#forcegraph svg")
+    .attr("width", width)
+    .attr("height", height);
+
+
+// add the links and the arrows
+var path = svg.append("svg:g").selectAll("path")
+    .data(force.links())
+  .enter().append("svg:path")
+//    .attr("class", function(d) { return "link " + d.type; })
+    .attr("class", "link")
+    .attr("marker-end", "url(#end)");
+
+// define the nodes
+var node = svg.selectAll(".node")
+    .data(force.nodes())
+  .enter().append("g")
+    .attr("class", "node")
+    .call(force.drag);
+
+// add the nodes
+node.append("circle")
+    .attr("r", 5);
+
+// add the text 
+node.append("text")
+    .attr("x", 12)
+    .attr("dy", ".35em")
+    .text(function(d) { return d.name; });
+
+
+// add the curvy lines
+function tick() {
+    path.attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy) + 100;
+        return "M" + 
+            d.source.x + "," + 
+            d.source.y + "A" + 
+            dr + "," + dr + " 0 0,1 " + 
+            d.target.x + "," + 
+            d.target.y;
+    });
+
+    node
+        .attr("transform", function(d) { 
+        return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+});

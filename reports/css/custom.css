@@ -13,8 +13,24 @@ p .tooltip {
 	font-size: 10px;
 }
 
+#chordchart svg {
+	height: 2000px;
+}
+
 .chord path {
   fill-opacity: .67;
   stroke: #000;
   stroke-width: .5px;
+}
+
+
+# force graph
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
 }
