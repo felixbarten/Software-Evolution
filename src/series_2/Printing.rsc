@@ -303,31 +303,32 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 		values += "\t\t\"clone\": \"<key>\",\n";
 		
 		clonevalue = clonemap[key];
-		values += "\t\t\"clones\": [";
+		values += "\t\t\"clones\": [\n";
 		
 		for (langenaam <- clonevalue) {
 			for (list[str] lst <- langenaam) {
-				values += "\t\t\t: [";
+				values += "\t\t\t[\n";
 				
 				for (str val <- lst) {
 					///iprintln(langenaam);
-					val = escape(val, ("\"": "\""));
-					values += "\"<val>\",\n";
+					if (/"/ := val) {
+						val = escape(val, ("\"": "\\\""));
+					}
+					values += "\t\t\t\t\"<val>\",\n";
 				}
-				values += "\t\t\t]";
-
+				values = values[..-2];
+				values += "\t\t\t],\n";
 			}
 		}
 		values = values[..-2];
 		values += "\t\t\t]\n";
 		
 		values += "\t\t},\n";
-		
 	}
+	values = values[..-2];
+	appendToFile(JSON, values);
 	appendToFile(JSON, "]\n");
 	
-	
-	appendToFile(JSON, values);
 	
 }
 public void startJSON(loc file) {
