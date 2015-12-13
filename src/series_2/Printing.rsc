@@ -3,6 +3,7 @@ module series_2::Printing
 import Prelude;
 import analysis::statistics::Descriptive;
 import util::Math;
+import Relation;
 
 alias snip = tuple[ loc location, value code];
 
@@ -269,6 +270,62 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, "]");
 	// end json file
 
+}
+
+public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
+	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n");
+	rel [str, tuple[list[str],list[str]]] codeclones = {};
+	values = "";
+
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+			
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+	
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		
+		tuple[list[str], list[str]] srcs = <readFileLines(pair.first.location), readFileLines(pair.second.location)>;
+		codeclones += {<clone1, srcs>};
+		
+	}
+	
+	clonemap = index(codeclones);
+	appendToFile(JSON, "[\n");
+	
+	for (key <- clonemap) {
+		values += "\t{";
+		values += "\t\"clone\": \"<key>\"";
+		
+		clonevalue = clonemap[key];
+		values += "\"clones\": [";
+		
+		for (langenaam <- clonevalue) {
+			for (list[str] lst <- langenaam {
+				for (str val <- lst) {
+					///iprintln(langenaam);
+					langenaam = escape(langenaam[0], ("\"": "\""));
+					values += "\"<langenaam>\",\n";
+				}
+			}
+		}
+		values = values[..-2];
+		values += "\t\t]";
+		
+		values += "\t\t}";
+		
+	}
+	appendToFile(JSON, "]\n");
+	
+	
+	appendToFile(JSON, values);
+	
 }
 public void startJSON(loc file) {
 	writeFile(file, "");

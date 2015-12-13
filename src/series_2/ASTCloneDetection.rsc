@@ -107,7 +107,7 @@ public void printSnips (rel[snip, snip] clones){
 	printBarGraph2(clonePairs, report, project);
 	printChordDiagram(clonePairs, report, project);
 	printForceGraph(clonePairs, report, project);
-	
+	printCodeClones(clonePairs, report, project);
 	
 	iprintln("Found clones: <size(clonePairs)>");	
 	Duration execution = createDuration(beginTime, now());
