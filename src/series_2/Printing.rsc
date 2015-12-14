@@ -339,7 +339,6 @@ public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc pr
 	// end json file
 }
 
-
 public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
@@ -359,7 +358,9 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 		}
 		
 		tuple[list[str], list[str]] srcs = <readSrc(pair.first.location), readSrc(pair.second.location)>;
-		codeclones += {<clone1, srcs>};
+		if (clone1 != "/") {
+			codeclones += {<clone1, srcs>};
+		}
 		
 	}
 	
@@ -367,31 +368,39 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, "[\n");
 	
 	for (key <- clonemap) {
-		values += "\t{\n";
-		values += "\t\t\"clone\": \"<key>\",\n";
+		values += "    {\n";
+		values += "        \"clone\": \"<key>\",\n";
 		
 		clonevalue = clonemap[key];
-		values += "\t\t\"clones\": [\n";
+		values += "        \"clones\": [\n";
 		
 		for (langenaam <- clonevalue) {
 			for (list[str] lst <- langenaam) {
-				values += "\t\t\t[\n";
+				values += "            [\n";
 				
 				for (str val <- lst) {
 					if (/"/ := val) {
 						// if strings contain double quotes escape these in JS.
 						val = escape(val, ("\"": "\\\""));
 					}
-					values += "\t\t\t\t\"<val>\",\n";
+					/*
+					if (/'/ := val) {
+						// if strings contain double quotes escape these in JS.
+						val = escape(val, ("\'": "\\\'"));
+					}
+					*/
+					val = escape(val, ("\t": "   "));
+					values += "                \"<val>\",\n";
 				}
 				values = values[..-2];
-				values += "\t\t\t],\n";
+				values += "\n            ],\n";
 			}
 		}
 		values = values[..-2];
-		values += "\t\t\t]\n";
 		
-		values += "\t\t},\n";
+		values += "\n        ]\n";
+		
+		values += "    },\n";
 	}
 	values = values[..-2];
 	appendToFile(JSON, values);
