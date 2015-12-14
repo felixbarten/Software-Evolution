@@ -310,8 +310,8 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 				values += "\t\t\t[\n";
 				
 				for (str val <- lst) {
-					///iprintln(langenaam);
 					if (/"/ := val) {
+						// if strings contain double quotes escape these in JS.
 						val = escape(val, ("\"": "\\\""));
 					}
 					values += "\t\t\t\t\"<val>\",\n";
@@ -327,6 +327,7 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	}
 	values = values[..-2];
 	appendToFile(JSON, values);
+	appendToFile(JSON, "\n");
 	appendToFile(JSON, "]\n");
 	
 	
