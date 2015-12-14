@@ -34,3 +34,13 @@ public void printSnips (rel[snip, snip] clones){
 		iprintln(clone[1].location);	
 	}
 }
+
+@doc {
+	Returns list of strings unless the loc provided is unknown
+}
+public list[str] readSrc(loc file) {
+	if (file != getUnknownLoc()) {
+		return readFileLines(file);
+	}
+	return [];
+}

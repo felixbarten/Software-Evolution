@@ -20,6 +20,7 @@ function stripProjectName(name) {
     return name;
 
 }
+  var barfill = d3.scale.category20();
 
   //var data = projects[project];
 	//console.log(project);
@@ -68,7 +69,7 @@ var margin = {top: 40, right: 20, bottom: 30, left: 40},
 
 var formatPercent = d3.format(".0%");
 
-var x = d3.scale.ordinal()
+var x = d3.scale.category20()
     .rangeRoundBands([0, width], .1);
 
 var y = d3.scale.linear()
@@ -127,6 +128,7 @@ d3.json("json/bargraph.json", function(error, data) {
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return y(d.value); })
       .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return barfill(d.value); })
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
 
@@ -136,6 +138,152 @@ function type(d) {
   d.value = +d.value;
   return d;
 }
+
+// bar CLASS graph 
+// bar chart
+
+var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var classtip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>" + d.clones + ":</strong> <span style='color:red'>Size: "+ d.value + "</span>";
+  })
+
+var barclasssvg = d3.select("#barclassgraph")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+barclasssvg.call(classtip);
+
+d3.json("json/cloneclassbargraph.json", function(error, data) {
+  x.domain(data.map(function(d) { return d.key; }));
+  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+  barclasssvg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .text("Clone Pairs")
+      .call(xAxis);
+
+  barclasssvg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Number of fragments");
+
+  barclasssvg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.key); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return barfill(d.value); })
+      .on('mouseover', classtip.show)
+      .on('mouseout', classtip.hide)
+ 
+});
+
+// bar CLASS LOC GRAPH
+
+var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatPercent = d3.format(".0%");
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var classloctip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>" + d.clones + ":</strong> <span style='color:red'>Size: "+ d.value + "</span>";
+  })
+
+var barclasslocsvg = d3.select("#barclasslocgraph")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+barclasslocsvg.call(classloctip);
+
+d3.json("json/cloneclasslocbargraph.json", function(error, data) {
+  x.domain(data.map(function(d) { return d.key; }));
+  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+  barclasslocsvg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .text("Clone Pairs")
+      .call(xAxis);
+
+  barclasslocsvg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("LOC");
+
+  barclasslocsvg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.key); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return barfill(d.value); })
+      .on('mouseover', classloctip.show)
+      .on('mouseout', classloctip.hide)
+   
+});
+
 
 
 // Chord graph 
@@ -258,8 +406,8 @@ links.forEach(function(link) {
     link.value = +link.value;
 });
 
-var width = 960,
-    height = 500;
+var width = 1140,
+    height = 700;
 
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
@@ -276,12 +424,11 @@ var svg = d3.select("#forcegraph svg")
 
 
 // add the links and the arrows
-var path = svg.append("svg:g").selectAll("path")
-    .data(force.links())
-  .enter().append("svg:path")
-//    .attr("class", function(d) { return "link " + d.type; })
-    .attr("class", "link")
-    .attr("marker-end", "url(#end)");
+var link = svg.selectAll(".link")
+      .data(force.links())
+    .enter().append("line")
+      .attr("class", "link")
+      .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
 // define the nodes
 var node = svg.selectAll(".node")
@@ -298,22 +445,17 @@ node.append("circle")
 node.append("text")
     .attr("x", 12)
     .attr("dy", ".35em")
-    .text(function(d) { return d.name; });
+    .attr("style", "font-size: 10px;")
+    .text(function(d) { return stripProjectName(d.name); });
 
 
 // add the curvy lines
 function tick() {
-    path.attr("d", function(d) {
-        var dx = d.target.x - d.source.x,
-            dy = d.target.y - d.source.y,
-            dr = Math.sqrt(dx * dx + dy * dy) + 100;
-        return "M" + 
-            d.source.x + "," + 
-            d.source.y + "A" + 
-            dr + "," + dr + " 0 0,1 " + 
-            d.target.x + "," + 
-            d.target.y;
-    });
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
 
     node
         .attr("transform", function(d) { 

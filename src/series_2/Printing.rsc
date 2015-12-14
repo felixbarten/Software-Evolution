@@ -4,6 +4,7 @@ import Prelude;
 import analysis::statistics::Descriptive;
 import util::Math;
 import Relation;
+import series_2::misc::util;
 
 alias snip = tuple[ loc location, value code];
 
@@ -272,6 +273,73 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 
 }
 
+public void printClassesBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/cloneclassbargraph.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n ");
+	
+	values = "";
+	// sort data 
+	int id = 1; 
+	for (set[loc] class <- cloneclasses){
+			values += "\t{\n";
+			values += "\t\t\"key\": <id>,\n";
+			values += "\t\t\"value\": <size(class)>,\n";
+			values += "\t\t\"clones\": [\n";
+			for (loc codelocation <- class) {
+				values += "\t\t\t\"<codelocation>\",\n";
+			}
+			values = values[..-2];
+			values += "\t\t]\n";
+			values += "\t},\n";
+			id += 1;
+	}
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+}
+public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/cloneclasslocbargraph.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n ");
+	
+	values = "";
+	// sort data 
+	int id = 1; 
+	for (set[loc] class <- cloneclasses){
+			values += "\t{\n";
+			values += "\t\t\"key\": <id>,\n";
+			values += "\t\t\"clones\": [\n";
+			int locsize = 0;
+			for (loc codelocation <- class) {
+				values += "\t\t\t\"<codelocation>\",\n";
+				locsize += size(readSrc(codelocation));
+			}			
+			values = values[..-2];
+			values += "\t\t],\n";
+			values += "\t\t\"value\": <locsize>\n";
+			
+			values += "\t},\n";
+			id += 1;
+	}
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+}
+
+
 public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
@@ -290,7 +358,7 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 			clone1 = substring(clone1, (index1 + size(authority))); 
 		}
 		
-		tuple[list[str], list[str]] srcs = <readFileLines(pair.first.location), readFileLines(pair.second.location)>;
+		tuple[list[str], list[str]] srcs = <readSrc(pair.first.location), readSrc(pair.second.location)>;
 		codeclones += {<clone1, srcs>};
 		
 	}
@@ -332,6 +400,7 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	
 	
 }
+
 public void startJSON(loc file) {
 	writeFile(file, "");
 	appendToFile(file, "bardata = [\n");
