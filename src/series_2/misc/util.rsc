@@ -23,7 +23,10 @@ public loc getUnknownLoc() {
 	unknown = unknown[end = <11,1>];
 	return unknown;
 }
-
+@doc{
+    Create random child;
+}
+public node createChild(node n) = makeNode("f", n );
 @doc{
     print the location of snips relations 
 }

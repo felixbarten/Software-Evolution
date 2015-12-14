@@ -73,6 +73,8 @@ public tuple[int,int,int] getLOC(loc location, bool debug) {
 	return <LOC,blankLines,comments>;
 }
 
+public int getLOCAstSubTree(loc location) = getLOC(location, false)[0];
+
 /*
 	We use the following values(KLOC) from the SIG paper to grade this(descending):
 	0-66
