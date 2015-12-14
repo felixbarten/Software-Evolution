@@ -4,6 +4,7 @@ import Prelude;
 import analysis::statistics::Descriptive;
 import util::Math;
 import Relation;
+import series_2::misc::util;
 
 alias snip = tuple[ loc location, value code];
 
@@ -272,6 +273,72 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 
 }
 
+public void printClassesBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/cloneclassbargraph.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n ");
+	
+	values = "";
+	// sort data 
+	int id = 1; 
+	for (set[loc] class <- cloneclasses){
+			values += "\t{\n";
+			values += "\t\t\"key\": <id>,\n";
+			values += "\t\t\"value\": <size(class)>,\n";
+			values += "\t\t\"clones\": [\n";
+			for (loc codelocation <- class) {
+				values += "\t\t\t\"<codelocation>\",\n";
+			}
+			values = values[..-2];
+			values += "\t\t]\n";
+			values += "\t},\n";
+			id += 1;
+	}
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+}
+public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/cloneclasslocbargraph.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n ");
+	
+	values = "";
+	// sort data 
+	int id = 1; 
+	for (set[loc] class <- cloneclasses){
+			values += "\t{\n";
+			values += "\t\t\"key\": <id>,\n";
+			values += "\t\t\"clones\": [\n";
+			int locsize = 0;
+			for (loc codelocation <- class) {
+				values += "\t\t\t\"<codelocation>\",\n";
+				locsize += size(readSrc(codelocation));
+			}			
+			values = values[..-2];
+			values += "\t\t],\n";
+			values += "\t\t\"value\": <locsize>\n";
+			
+			values += "\t},\n";
+			id += 1;
+	}
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+}
+
 public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
@@ -290,8 +357,10 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 			clone1 = substring(clone1, (index1 + size(authority))); 
 		}
 		
-		tuple[list[str], list[str]] srcs = <readFileLines(pair.first.location), readFileLines(pair.second.location)>;
-		codeclones += {<clone1, srcs>};
+		tuple[list[str], list[str]] srcs = <readSrc(pair.first.location), readSrc(pair.second.location)>;
+		if (clone1 != "/") {
+			codeclones += {<clone1, srcs>};
+		}
 		
 	}
 	
@@ -299,38 +368,48 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, "[\n");
 	
 	for (key <- clonemap) {
-		values += "\t{\n";
-		values += "\t\t\"clone\": \"<key>\",\n";
+		values += "    {\n";
+		values += "        \"clone\": \"<key>\",\n";
 		
 		clonevalue = clonemap[key];
-		values += "\t\t\"clones\": [\n";
+		values += "        \"clones\": [\n";
 		
 		for (langenaam <- clonevalue) {
 			for (list[str] lst <- langenaam) {
-				values += "\t\t\t[\n";
+				values += "            [\n";
 				
 				for (str val <- lst) {
-					///iprintln(langenaam);
 					if (/"/ := val) {
+						// if strings contain double quotes escape these in JS.
 						val = escape(val, ("\"": "\\\""));
 					}
-					values += "\t\t\t\t\"<val>\",\n";
+					/*
+					if (/'/ := val) {
+						// if strings contain double quotes escape these in JS.
+						val = escape(val, ("\'": "\\\'"));
+					}
+					*/
+					val = escape(val, ("\t": "   "));
+					values += "                \"<val>\",\n";
 				}
 				values = values[..-2];
-				values += "\t\t\t],\n";
+				values += "\n            ],\n";
 			}
 		}
 		values = values[..-2];
-		values += "\t\t\t]\n";
 		
-		values += "\t\t},\n";
+		values += "\n        ]\n";
+		
+		values += "    },\n";
 	}
 	values = values[..-2];
 	appendToFile(JSON, values);
+	appendToFile(JSON, "\n");
 	appendToFile(JSON, "]\n");
 	
 	
 }
+
 public void startJSON(loc file) {
 	writeFile(file, "");
 	appendToFile(file, "bardata = [\n");

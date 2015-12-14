@@ -17,11 +17,11 @@ void main(loc project){
 	println("Total clone classes found: <size(cloneClasses)>\n");	
 	Duration execution = createDuration(beginTime, now());
 	
-	writeOutputToFile(clonePairs,execution,project);
+	writeOutputToFile(clonePairs, cloneClasses, execution,project);
 
 }
 
-void writeOutputToFile(clonePairs, execution, project){
+void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 
 	loc report = startReport(project);
 
@@ -32,6 +32,9 @@ void writeOutputToFile(clonePairs, execution, project){
 	printForceGraph(clonePairs, report, project);
 	printCodeClones(clonePairs, report, project);
 	printProjectExecutionTime(execution, report); 	
-
+	
+	printClassesBarGraph(cloneClasses, report, project);
+	printClassesLOCBarGraph(cloneClasses, report, project);
+	
 	endReport(report);
 }
