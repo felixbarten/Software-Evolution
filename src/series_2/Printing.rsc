@@ -349,6 +349,7 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
 		str authority = project.authority;
+		authority += "/src/";
 			
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);
@@ -406,8 +407,6 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, values);
 	appendToFile(JSON, "\n");
 	appendToFile(JSON, "]\n");
-	
-	
 }
 
 public void startJSON(loc file) {

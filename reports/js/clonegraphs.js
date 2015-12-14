@@ -320,7 +320,7 @@ d3.json("json/chordgraph.json", function(imports) {
 
 // JS hack to get shorter names.
   function name(name) {
-    return stripProjectName(name);
+    return name;
   }
 
   // Compute a unique index for each package name.
@@ -345,13 +345,15 @@ d3.json("json/chordgraph.json", function(imports) {
   });
 
   chord.matrix(matrix);
+  console.log(matrix);
 
   var g = chsvg.selectAll("g.group")
       .data(chord.groups)
     .enter().append("svg:g")
       .attr("class", "group")
       .on("mouseover", fade(.02))
-      .on("mouseout", fade(.80));
+      .on("mouseout", fade(.80))
+      .on("click", drillDown());
 
   g.append("svg:path")
       .style("stroke", function(d) { return fill(d.index); })
@@ -367,7 +369,7 @@ d3.json("json/chordgraph.json", function(imports) {
             + "translate(" + (r0 + 26) + ")"
             + (d.angle > Math.PI ? "rotate(180)" : "");
       })
-      .text(function(d) { return nameByIndex[d.index]; });
+      .text(function(d) { return stripProjectName(nameByIndex[d.index]); });
 
   chsvg.selectAll("path.chord")
       .data(chord.chords)
@@ -382,6 +384,8 @@ d3.json("json/chordgraph.json", function(imports) {
 // Returns an event handler for fading a given chord group.
 function fade(opacity) {
   return function(d, i) {
+    console.log(d);
+    console.log(i);
     chsvg.selectAll("path.chord")
         .filter(function(d) { return d.source.index != i && d.target.index != i; })
       .transition()
@@ -389,7 +393,12 @@ function fade(opacity) {
         .style("fill-opacity", opacity);
   };
 }
-
+function drillDown() {
+  return function(d,i) {
+    console.log(names[i]);
+    window.location = "clonesource.html?clone=" + names[i];
+  }
+}
 
 
 // get the data
