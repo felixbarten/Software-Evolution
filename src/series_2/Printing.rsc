@@ -9,7 +9,7 @@ alias snip = tuple[ loc location, value code];
 
 public loc startReport(loc project) {
 	loc file = |project://Software-Evolution/reports/clonereport.html|;
-	println("writing report");
+	println("Writing report...");
 	// write or overrwrite file. 
 	str msg  = "\<html\>\<header\>";
 	writeFile(file, msg);	
@@ -39,21 +39,21 @@ public void endReport(loc file) {
 
 	appendToFile(file, "\</div\>");
 	appendToFile(file, "\</body\>\n\</html\>");
-	println("Finished writing report");
+	println("\nFinished writing report.");
 }
 
 public void printExecutionTime(Duration duration, loc file) {
 	newline = "\</br\>";
 	durationStr = "Total calculations completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
-	iprintln(durationStr);
+	println(durationStr);
 	durationStr += newline;
 	appendToFile(file, durationStr);
 }
 
 public void printProjectExecutionTime(Duration duration, loc file) {
 	newline = "\</br\>";
-	durationStr = "Calculations for project completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
-	iprintln(durationStr);
+	durationStr = "\nCalculations for project completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
+	println(durationStr);
 	durationStr += newline;
 	appendToFile(file, durationStr);
 }
@@ -61,7 +61,7 @@ public void printProjectExecutionTime(Duration duration, loc file) {
 public void printMetricCalculationTime(Duration duration, str metric, loc file) {
 	newline = "\</br\>";
 	durationStr = "Calculations for <metric> were completed in: <duration.years> years, <duration.months> months, <duration.days> days, <duration.hours> hours, <duration.minutes> minutes, <duration.seconds> seconds and <duration.milliseconds> milliseconds.";
-	iprintln(durationStr);
+	println(durationStr);
 	durationStr += newline;
 	appendToFile(file, durationStr);
 }

@@ -1,36 +1,30 @@
 module series_2::ASTCloneDetection
 
 import Prelude;
+import util::Math;
+import DateTime;
+
 import lang::java::jdt::m3::Core;
 import lang::java::jdt::m3::AST;
 import lang::java::m3::AST;
 import lang::java::m3::Core;
-import util::Math;
+
 import series_2::misc::util;
 import series_2::misc::datatypes;
-import DateTime;
 import series_2::Type_II;
 import series_2::Printing;
 
+int WEIGHT_THRESHOLD = 35;
+real SIMILARITY_THRESHOLD = 0.7;
 
-public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
-    temp = pairs+;
-	temp += ident(carrier(temp)); 
-	temp += invert(temp);
-	return determineEquivalenceClasses(temp);	
-}
-
- public rel[snip, snip] getDups(loc project) {
-	loc report = startReport(project);
-	datetime beginTime = now();
-	map[value, rel[loc, value]] m = ();
+ public rel[snip, snip] getClonePairs(loc project) {
+	map[value, snips] m = ();
 	set[node] asts = createAstsFromEclipseProject(project, false);
 
 	rel[snip, snip] clonePairs = {};
-	int subtreeWeightThreshold = 25;	
-	real similarityThreshold = 0.7;
+	int subtreeWeightThreshold = WEIGHT_THRESHOLD;	
+	real similarityThreshold = SIMILARITY_THRESHOLD;
 
-	
 	visit(asts) {
 		case node a:{
 			if(calcSubtreeSize(a) >= subtreeWeightThreshold){
@@ -39,8 +33,6 @@ public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
 		}
 	 }
 
-	buckets = range(m);
-
 	for(bucket <- range(m), size(bucket) > 1){
 		for(tuple[snip first, snip second] pair <- sort(bucket * bucket) , pair.first != pair.second, calcSimularity(pair.first.code, pair.second.code) >= similarityThreshold){
 			clonePairs = removeExistingSubtrees(pair.first.code,clonePairs);
@@ -48,27 +40,18 @@ public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
 			clonePairs += pair;
 		}
 	}
-    
-    //iprintln(getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- clonePairs)));
-	iprintln("Total clone pairs found: <size(clonePairs)>");	
-	iprintln("Execution time: <showDuration(createDuration(beginTime, now()))>"); 	
-	//iprintln(getCloneClasses(clonePairs));
 	
-	
-	printSnipsToFile(clonePairs, report);
-	printBarGraph(clonePairs, report, project);
-	printBarGraph2(clonePairs, report, project);
-	printChordDiagram(clonePairs, report, project);
-	printForceGraph(clonePairs, report, project);
-	printCodeClones(clonePairs, report, project);
-	
-	Duration execution = createDuration(beginTime, now());
-	printProjectExecutionTime(execution, report); 	
-	endReport(report);
 	return clonePairs;	
 }
 
-map[value, rel[loc, value]] addSubtreeToMap(subtree, map[value, rel[loc, value]] m){
+public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
+    temp = pairs+;
+	temp += ident(carrier(temp)); 
+	temp += invert(temp);
+	return determineEquivalenceClasses(temp);	
+}
+
+map[value, snips] addSubtreeToMap(subtree, map[value, rel[loc, value]] m){
     loc source;
     try{
         switch(subtree){
@@ -113,16 +96,8 @@ set[value] treeToSet(value t){
 	return nodes;
 }
 
-//2xS/(2xS+L+R)
-real calcSimularity(value l, value r){
-	set[value] left = treeToSet(l);
-	set[value] right = treeToSet(r);
-
-	real nShared = toReal(size(left & right));
-	real dNodesL = toReal(size(left - right));
-	real dNodesR = toReal(size(right - left));
-
-	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
+bool areType2Clones(snip a, snip b){
+    return a.code != b.code;
 }
 
 bool areType3Clones(a, b){
@@ -133,16 +108,6 @@ bool areType3Clones(a, b){
     }
     return calcSimularity(a,b) > similarityThreshold; 
 }  
-
-int calcSubtreeSize(value n){
-	int size = 0;
-    visit (n){
-        case node child:{
-             size += 1;
-        }	
-    }
-	return size;
-} 
 
 int calcSubtreeSize(node n){
 	int size = 0;
@@ -169,9 +134,19 @@ test bool calculateSubtreeSizeTest(int c){
 	return c == x;	
 }
 
-test bool calcSimilarityTest1(node b){
-	return calcSimularity(b,b) == 1.0;	
+//2xS/(2xS+L+R)
+real calcSimularity(value l, value r){
+	set[value] left = treeToSet(l);
+	set[value] right = treeToSet(r);
+
+	real nShared = toReal(size(left & right));
+	real dNodesL = toReal(size(left - right));
+	real dNodesR = toReal(size(right - left));
+
+	return 2*nShared/(2*nShared + dNodesL + dNodesR); 
 }
+
+test bool calcSimilarityTest1(node b)= calcSimularity(b,b) == 1.0;	
 
 test bool calcSimilarityTest2(){
 	node a = makeNode("a", "1");
@@ -179,6 +154,4 @@ test bool calcSimilarityTest2(){
 	return calcSimularity(a,b) == 0.0;	
 }
 
-private node createChild(node n){
-	return makeNode("f", n );
-}
+private node createChild(node n) = makeNode("f", n );
