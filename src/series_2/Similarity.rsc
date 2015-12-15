@@ -39,7 +39,7 @@ test bool calcSimilarityTest3(){
 //Check for exact clones
 bool areType1Clones(snip a, snip b) = a.code == b.code; 
 
-//DOES NOT NORMALIZE
+// PAY ATTENTION: WRONG FOR TYPE3 DOES NOT NORMALIZE
 bool areType2Clones(snip a, snip b) = !areType1Clones(a,b);
 
 //Uses similarity between to determine if type 3

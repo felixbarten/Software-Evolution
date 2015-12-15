@@ -83,13 +83,17 @@ public rel[snip, snip] type3ClonePairs = {};
     println("Progress: 100% (Type 1 + 2)\n"); 
 
     cleanPairs = removeBlocksIfEntireMethodPresent(clonePairs);
+
     type1ClonePairs = {p | cpair p <- cleanPairs, p.first.code == p.second.code}; 
     println("Type 1#: <size(type1ClonePairs)>");
+
     type2ClonePairs = {p | cpair p <- cleanPairs, areType2Clones(p.first,p.second)};
     println("Type 2#: <size(type2ClonePairs)>");
-    type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- cleanup(clonePairs3)};
-    println("Type 3#: <size(type3ClonePairs)>");
+
+    type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- removeBlocksIfEntireMethodPresent(clonePairs3)};
+    println("Type 3#: <size(type3ClonePairs)>/n");
     println("Clone detection complete");
+
 	return type1ClonePairs + type2ClonePairs + type3ClonePairs;	
 }
 
@@ -146,7 +150,7 @@ cmaps addSubtreeToMaps(subtree, map[codeAst, snips] clones,map[att, set[codeAst]
         rewrittenTree = astTransformFunction(subtree);
  //       if(calcSubtreeSize(subtree) > 30){ 
         if(true){ 
-            cc = calcMethodCC(subtree);
+            cc = calcSubtreeCC(subtree);
             if(metrics[<SLOCs,cc>]?){
                 metrics[<SLOCs,cc>] += subtree;
             } else {
@@ -192,9 +196,17 @@ rel[snip,snip] removeBlocksIfEntireMethodPresent(rel[snip,snip] clonePairs){
     blocks = {b.code| snip b <- allSnips, \block := b.code};
 
     for(snip m <- allSnips, \method(_,_,_,_,b) := m.code, b in blocks) {
-        iprintln(size(clonePairs));
         clonePairs = {<l,r> | < snip l, snip r> <- clonePairs, \block := l.code || \block  := r.code, l.code != b, r.code != b};
-        iprintln(size(clonePairs));
+    }
+
+    return clonePairs;
+}
+rel[codeAst,codeAst] removeBlocksIfEntireMethodPresent(rel[codeAst,codeAst] clonePairs){
+    set[codeAst] allCode =  carrier(clonePairs);
+    blocks = {b| codeAst b <- allCode, \block := b};
+
+    for(codeAst m <- allCode, \method(_,_,_,_,b) := m, b in blocks) {
+        clonePairs = {<l,r> | < codeAst l, codeAst r> <- clonePairs, \block := l || \block  := r, l != b, r != b};
     }
 
     return clonePairs;

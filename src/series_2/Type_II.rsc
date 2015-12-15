@@ -25,7 +25,7 @@ node rewriteAST ( node ast) {
 		case \simpleName(_) => \simpleName(uniformstr)
 
 		// classes
-		case \class(name, extends, implements, body) => \class(uniformstr, extends, implements, body)
+		case \class(name, extends, implements, body) => \class(name, extends, implements, body)
 
 		// methods
 		case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions, impl)

@@ -340,6 +340,75 @@ public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc pr
 	// end json file
 }
 
+public void printType3ClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
+	loc JSON = |project://Software-Evolution/reports/json/type3pairs.json|;
+	writeFile(JSON, "");
+	rel [str, tuple[list[str],list[str]]] codeclones = {};
+	values = "";
+
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+			
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+	
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		
+		tuple[list[str], list[str]] srcs = <readSrc(pair.first.location), readSrc(pair.second.location)>;
+		if (clone1 != "/") {
+			codeclones += {<clone1, srcs>};
+		}
+		
+	}
+	
+	clonemap = index(codeclones);
+	appendToFile(JSON, "[\n");
+	
+	for (key <- clonemap) {
+		values += "    {\n";
+		values += "        \"clone\": \"<key>\",\n";
+		
+		clonevalue = clonemap[key];
+		values += "        \"clones\": [\n";
+		
+		for (langenaam <- clonevalue) {
+			for (list[str] lst <- langenaam) {
+				values += "            [\n";
+				
+				for (str val <- lst) {
+					if (/"/ := val) {
+						// if strings contain double quotes escape these in JS.
+						val = escape(val, ("\"": "\\\""));
+					}
+					/*
+					if (/'/ := val) {
+						// if strings contain double quotes escape these in JS.
+						val = escape(val, ("\'": "\\\'"));
+					}
+					*/
+					val = escape(val, ("\t": "   "));
+					values += "                \"<val>\",\n";
+				}
+				values = values[..-2];
+				values += "\n            ],\n";
+			}
+		}
+		values = values[..-2];
+		
+		values += "\n        ]\n";
+		
+		values += "    },\n";
+	}
+	values = values[..-2];
+	appendToFile(JSON, values);
+	appendToFile(JSON, "\n");
+	appendToFile(JSON, "]\n");
+}
 public void printClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
