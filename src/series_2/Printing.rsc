@@ -82,11 +82,15 @@ public void printTypeIClones(rel[snip, snip] clonepairs, loc file) {
 }
 
 public void printMatrixGraph(rel[snip, snip] clonepairs) {
+	println("Printing Matrix Graph");
+
 	loc JSON = |project://Software-Evolution/reports/json/matrix.json|;
 }
 
 public void printChordDiagram(rel[snip, snip] clonepairs, loc file, loc project) {
-	loc JSON = |project://Software-Evolution/reports/json/forcegraph.json|;
+	println("Printing Chord Graph");
+
+	loc JSON = |project://Software-Evolution/reports/json/chordgraph.json|;
 	writeFile(JSON, "");
 	appendToFile(JSON, "[\n");
 	// insert key and value
@@ -132,7 +136,9 @@ public void printChordDiagram(rel[snip, snip] clonepairs, loc file, loc project)
 }
 
 public void printForceGraph(rel[snip, snip] clonepairs, loc file, loc project) {
-	loc JSON = |project://Software-Evolution/reports/json/chordgraph.json|;
+	println("Printing Force Graph");
+
+	loc JSON = |project://Software-Evolution/reports/json/forcegraph.json|;
 	writeFile(JSON, "");
 	appendToFile(JSON, "[\n");
 	// insert key and value
@@ -179,12 +185,14 @@ public void printForceGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 
 
 public void printClonePairBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
+	println("Printing Clone Pair bar graph");
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/bargraph.json|;
 	writeFile(JSON, "");
 	appendToFile(JSON, "[\n");
 	
+	int id = 1;
 	values = "";
 	// sort data 
 	for (tuple[snip first, snip second] pair <- clonepairs){
@@ -228,6 +236,7 @@ public void printClonePairBarGraph(rel[snip, snip] clonepairs, loc file, loc pro
 }
 
 public void printClassesBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+	println("Printing Clone Classes Bar graph");
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/cloneclassbargraph.json|;
@@ -259,6 +268,7 @@ public void printClassesBarGraph(set[set[loc]] cloneclasses, loc file, loc proje
 	// end json file
 }
 public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
+	println("Printing Clone Classes LOC Bar Graph");
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/cloneclasslocbargraph.json|;
@@ -293,13 +303,13 @@ public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc pr
 	// end json file
 }
 
-
 public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc project) { 
+	println("Printing Clonepairs");
 	loc JSON = |project://Software-Evolution/reports/json/clonepairs2.json|;
 	writeFile(JSON, "");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
 	values = "";
-	id = 0;
+	int id = 1;
 
 	for (tuple[snip first, snip second] pair <- clonepairs){
 		values += "\t{\n";
@@ -315,7 +325,7 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 		values += "\t\t\"source\": [\n";
 		values += "\t\t\t[\n";
 		
-		for (str line <- readSrc(clone1)) {
+		for (str line <- readSrc(pair.first.location)) {
 			escaped = escape(line, ("\"": "\\\"","\t": "   "));
 			values += "\t\t\t\t\"<escaped>\",\n";
 		}
@@ -324,7 +334,7 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 		values += "\t\t\t],\n";
 		values += "\t\t\t[\n";
 
-		for (str line <- readSrc(clone2)) {
+		for (str line <- readSrc(pair.second.location)) {
 			escaped = escape(line, ("\"": "\\\"","\t": "   "));
 			values += "\t\t\t\t\"<escaped>\",\n";
 		}
@@ -335,7 +345,10 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 		// end of source array
 		values += "\t\t],\n";
 		// remove huge leaders to locations 
-				
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);
 
@@ -359,6 +372,8 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 }
 
 public void printType3ClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
+	println("Printing Type3 Clone Pairs");
+
 	loc JSON = |project://Software-Evolution/reports/json/type3pairs.json|;
 	writeFile(JSON, "");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
@@ -403,12 +418,6 @@ public void printType3ClonePairs(rel[snip, snip] clonepairs, loc file, loc proje
 						// if strings contain double quotes escape these in JS.
 						val = escape(val, ("\"": "\\\""));
 					}
-					/*
-					if (/'/ := val) {
-						// if strings contain double quotes escape these in JS.
-						val = escape(val, ("\'": "\\\'"));
-					}
-					*/
 					val = escape(val, ("\t": "   "));
 					values += "                \"<val>\",\n";
 				}
@@ -430,6 +439,8 @@ public void printType3ClonePairs(rel[snip, snip] clonepairs, loc file, loc proje
 
 
 public void printClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
+	println("Printing Clone Pairs");
+
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
@@ -500,6 +511,8 @@ public void printClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
 }
 
 public void printCloneClasses(set[set[loc]] cloneclasses, loc file, loc project) {
+	println("Printing Clone classes");
+
 	loc JSON = |project://Software-Evolution/reports/json/cloneclasses.json|;
 	writeFile(JSON, "");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
@@ -555,6 +568,7 @@ public void endJSON(loc file) {
 
 /* Obsolete code, NVD3 graphs */
 public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
+	println("Printing Bar Graph");
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/bargraph.js|;

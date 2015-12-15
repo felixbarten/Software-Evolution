@@ -38,7 +38,7 @@ void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 	printClonePairs(clonePairs, report, project);
 	printCloneClasses(cloneClasses, report, project);
 	printType3ClonePairs(type3ClonePairs, report, project);
-
+	printClonePairsSrc(clonePairs, report, project);
 
 	
 	endReport(report);

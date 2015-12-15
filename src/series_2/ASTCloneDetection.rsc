@@ -61,7 +61,7 @@ public rel[snip, snip] type3ClonePairs = {};
             codeSubset += metricMap[<i,n.cc>];
         }
         product = codeSubset * codeSubset;
-        clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
+        // clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
         count += 1;
         println("Progress: <round(count*1.0/total3*100,0.1)>%"); 
 	}
