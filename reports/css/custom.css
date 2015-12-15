@@ -72,3 +72,20 @@ div#bargraph svg g text {
 div#bargraph svg g.axis text {
   display: block;
 }
+
+
+
+div#groupedbargraph svg g.x.axis g.tick {
+  display: none;
+}
+div#groupedbargraph svg g text {
+  display: none;
+}
+
+div#groupedbargraph svg g.axis text {
+  display: block;
+}
+
+div#groupedbargraph svg g g.legend text {
+  display: block;
+}

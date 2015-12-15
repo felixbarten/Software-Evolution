@@ -17,7 +17,6 @@ var clonename = query["clone"];
 var clonepairid = query["clonepairid"];
 
 //var locations = "";
-var clonesrc = "";
 
 console.log("query obj: " + query);
 
@@ -61,7 +60,7 @@ if (clonename != undefined) {
 	h2.html("Clone Pair with ID: " + clonepairid);
 	d3.json("json/clonepairs2.json", function(error, data2) { 
 		var locations = "";
-
+		var clonesrc = "";
 		console.log(error);
 		console.log(data2);
 		for (d in data2) {
@@ -73,6 +72,7 @@ if (clonename != undefined) {
 				for (srcarr in dataobj.source) {
 					for (linenr in dataobj.source[srcarr]) {
 						clonesrc = clonesrc + dataobj.source[srcarr][linenr] + "</br>";
+
 					}
 
 					locations = "" + dataobj.clone1fullloc + "</br>" + dataobj.clone2fullloc + "</br>";
@@ -82,6 +82,7 @@ if (clonename != undefined) {
 					.append("p")
 					.append("pre")
 					.html(clonesrc);
+					clonesrc = "";
 				}
 
 

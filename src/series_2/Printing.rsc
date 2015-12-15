@@ -234,6 +234,130 @@ public void printClonePairBarGraph(rel[snip, snip] clonepairs, loc file, loc pro
 	// end json file
 
 }
+public void printClonePairTypeBarGraph(rel[snip, snip] type1,rel[snip, snip] type2,rel[snip, snip] type3, loc file, loc project) {
+	println("Printing Clone Pair grouped bar graph");
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/groupedbarchart.json|;
+	writeFile(JSON, "");
+	appendToFile(JSON, "[\n");
+	
+	int id = 1;
+	values = "";
+	// sort data 
+	for (tuple[snip first, snip second] pair <- type1){
+		values += "\t{\n";
+		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <size(readSrc(pair.first.location)) + size(readSrc(pair.second.location))>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"clonepairid\": <id>,\n";
+				values += "\t\t\"clonetype\": 1,\n";
+		
+		id += 1;
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	// type 2
+	for (tuple[snip first, snip second] pair <- type2){
+		values += "\t{\n";
+		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <size(readSrc(pair.first.location)) + size(readSrc(pair.second.location))>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"clonepairid\": <id>,\n";
+		values += "\t\t\"clonetype\": 2,\n";
+
+		id += 1;
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	
+	// type 3 
+	
+	for (tuple[snip first, snip second] pair <- type3){
+		values += "\t{\n";
+		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <size(readSrc(pair.first.location)) + size(readSrc(pair.second.location))>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"clonepairid\": <id>,\n";
+		values += "\t\t\"clonetype\": 3,\n";
+		id += 1;
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	
+	
+	
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+
+}
+
+
 
 public void printClassesBarGraph(set[set[loc]] cloneclasses, loc file, loc project) {
 	println("Printing Clone Classes Bar graph");

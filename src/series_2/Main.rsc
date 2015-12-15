@@ -31,6 +31,8 @@ void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 	printChordDiagram(clonePairs, report, project);
 	printForceGraph(clonePairs, report, project);
 	printProjectExecutionTime(execution, report); 	
+	printClonePairTypeBarGraph(type1ClonePairs, type2ClonePairs, type3ClonePairs,report, project);
+	
 	
 	printClassesBarGraph(cloneClasses, report, project);
 	printClassesLOCBarGraph(cloneClasses, report, project);

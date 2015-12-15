@@ -91,26 +91,26 @@ var tip = d3.tip()
     return "<strong>" + modifiedkey + ":</strong> <span style='color:red'>Size: "+ d.value + "</span>";
   })
 
-var svg = d3.select("#bargraph")
+var barpairsvg = d3.select("#bargraph")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-svg.call(tip);
+barpairsvg.call(tip);
 
 d3.json("json/bargraph.json", function(error, data) {
   x.domain(data.map(function(d) { return d.label; }));
   y.domain([0, d3.max(data, function(d) { return d.value; })]);
 
-  svg.append("g")
+  barpairsvg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .text("Clone Pairs")
       .call(xAxis);
 
-  svg.append("g")
+  barpairsvg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
@@ -120,7 +120,7 @@ d3.json("json/bargraph.json", function(error, data) {
       .style("text-anchor", "end")
       .text("LOC");
 
-  svg.selectAll(".bar")
+  barpairsvg.selectAll(".bar")
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
@@ -305,6 +305,181 @@ function onClickBarGraphClassLoc() {
   }
 }
 
+// grouped bar chart 
+
+// width = 960 - 40 - 20 = 900
+// height = 500 - 20 - 30 = 450
+var margin = { top: 20, right: 20, bottom: 30, left: 40 },
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+//  Constructs a new ordinal scale with an empty domain and an empty range.
+//  The ordinal scale is invalid (always returning undefined) until an output range is specified).
+var x1 = d3.scale.ordinal();
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.ordinal()
+    .range(["#097054", "#6599FF", "#FFDE00", "#FF9900"]);
+
+//  Set up the xAxis to use our x0 scale and be oriented on the bottom.
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+    // We don't worry about tickFormat here, as the ticks will be determined by the data.
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+//    .tickFormat(d3.format(".2s"));
+
+// Set up the svg canvas with the width and height we calculated earlier.
+var groupsvg = d3.select("#groupedbargraph").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// Move it to the right margin.left pixels, and move it down margin.top pixels
+
+
+// Our JSON looks like:
+//               [{ "YEAR": 2012, "MONTH": 1,  "MMM": "JAN", "Total": 36, "Completed": 21, "Canceled": 10,  "Aborted": 5 },
+//                { "YEAR": 2012, "MONTH": 2,  "MMM": "FEB", "Total": 60, "Completed": 30, "Canceled": 21, "Aborted": 9 }]
+
+//                data = d3.nest()
+//                    .key(function (d) { return d.MMM + " " + d.YEAR; })
+//                    .entries(json_data)
+
+d3.json("json/groupedbarchart.json", function(error, data) { 
+
+/*
+  {
+    "label": "/Users/felixbarten/Git/Software-Evolution/smallsql0.21_src/src/smallsql/database/ExpressionFunctionTruncate.java5060 + /Users/felixbarten/Git/Software-Evolution/smallsql0.21_src/src/smallsql/database/ExpressionFunctionRound.java5060",
+    "value": 10,
+    "begin1": 50,
+    "end1": 60,
+    "begin2": 50,
+    "end2": 60,
+    "clonepairid": 2,
+    "clonetype": 1,
+    "clone1": "smallsql/database/ExpressionFunctionTruncate.java",
+    "clone2": "smallsql/database/ExpressionFunctionRound.java"
+  },
+*/
+
+// seriesNames = "Total", "Completed", "Canceled" and "Aborted"               See, we're filtering out "YEAR", "MONTH" and "MMM"
+
+
+
+//var seriesNames = d3.keys(data[0]).filter(function (key) { return (key !== "label") && (key !== "value") && (key !== "begin1")&& (key !== "begin2")&& (key !== "end1")&& (key !== "end2")&& (key !== "clone1")&& (key !== "clone2")&& (key !== "clonepairid"); });
+
+var seriesNames = ["Type 1", "Type 2", "Type 3"]
+
+//                alert(JSON.stringify(seriesNames));
+//                alert(seriesNames);
+
+data.forEach(function (d) {
+    d.Flights = seriesNames.map(function (name) { 
+    var typ = d.clonetype;
+    var map  =   { 
+      name: name, 
+     value: 0
+    }; 
+    if (typ == 1 && map["name"] == "Type 1") {
+      map["value"]  = +d["value"] 
+
+    } else if (typ == 2 && map["name"] == "Type 2") {
+      map["value"]  = +d["value"] 
+
+    } else if (typ == 3 && map["name"] == "Type 3") {
+      map["value"]  = +d["value"] 
+    }
+    console.log(map);
+    return map;
+
+
+  });
+    console.log(d.Flights);
+    //alert("hi --- " + JSON.stringify(d.Flights));
+});
+
+//alert(JSON.stringify(data));
+
+//x0.domain(data.map(function (d) { return d.State; }));
+// Change State to be MMM, YEAR (for example: "Jan 2012") Could change this to Jan '12
+x0.domain(data.map(function (d) { return d.clonepairid }));
+//alert(JSON.stringify(data.map(function (d) { return d.MMM + " " + d.YEAR; })));
+
+//                //x1.domain(seriesNames).rangeRoundBands([0, x0.rangeBand()]);
+x1.domain(seriesNames).rangeRoundBands([0, x0.rangeBand()]);
+
+//                //y.domain([0, d3.max(data, function (d) { return d3.max(d.ages, function (d) { return d.value; }); })]);
+//                // Make the y domain go from 0 up to the max of d.Total (Total flights)
+//                y.domain([0, d3.max(data, function (d) { return d3.max(d.Total); })]);
+y.domain([0, (10 + d3.max(data, function (d) { return d3.max(d.Flights, function (d) { return d.value; }); }))]);
+
+
+// The axis business
+groupsvg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+groupsvg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("LOC of clone types");
+
+
+var state = groupsvg.selectAll(".state")
+    .data(data)
+.enter().append("g")
+    .attr("class", "g")
+    .attr("transform", function (d) { return "translate(" + x0(d.clonepairid) + ",0)"; });
+
+//alert(JSON.stringify(d.Flights[0]));
+state.selectAll("rect")
+    .data(function (d) { return d.Flights; })
+.enter().append("rect")
+    .attr("width", x1.rangeBand())
+    .attr("x", function (d) { return x1(d.name); })
+    .attr("y", function (d) { return y(d.value); })
+    .attr("height", function (d) { return height - y(d.value); })
+    .style("fill", function (d) { return color(d.name); })
+    .on('click', function(d) { console.log(d);});
+
+
+var legend = groupsvg.selectAll(".legend")
+    .data(seriesNames.slice().reverse())
+.enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+legend.append("rect")
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
+
+legend.append("text")
+    .attr("x", width - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function (d) { return d; })
+    .on("click", function (d) {
+        alert(d);
+        console.log(d);
+    });
+});
 
 // Chord graph 
 
