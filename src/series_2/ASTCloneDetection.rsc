@@ -29,7 +29,7 @@ public rel[snip, snip] type1ClonePairs = {};
 public rel[snip, snip] type2ClonePairs = {};
 public rel[snip, snip] type3ClonePairs = {};
 
- public rel[snip, snip] getClonePairs(loc project) {
+ public rel[snip, snip] getClonePairs(loc project, bool findType3) {
 
     println("Starting...\n");
 
@@ -46,26 +46,27 @@ public rel[snip, snip] type3ClonePairs = {};
 	rel[snip, snip] clonePairs = {};
 
     rel[codeAst, codeAst] clonePairs3 = {};	
-    
-    attributes = domain(metricMap);
-    real total3 = size(attributes) * 1.0;
-    println("Gathering Type 3 clones...");
-    int count = 0;
-	for(att n <- attributes){
-	    int begin = n.sloc-MAX_SLOC_VARIATION;
-	    int end = n.sloc+MAX_SLOC_VARIATION;
-        candidateRange = [begin..end];	
+    if(findType3){ 
+        attributes = domain(metricMap);
+        real total3 = size(attributes) * 1.0;
+        println("Gathering Type 3 clones...");
+        int count = 0;
+        for(att n <- attributes){
+            int begin = n.sloc-MAX_SLOC_VARIATION;
+            int end = n.sloc+MAX_SLOC_VARIATION;
+            candidateRange = [begin..end];	
 
-        codeSubset = {};
-        for(i <- candidateRange, metricMap[<i,n.cc>]?){
-            codeSubset += metricMap[<i,n.cc>];
+            codeSubset = {};
+            for(i <- candidateRange, metricMap[<i,n.cc>]?){
+                codeSubset += metricMap[<i,n.cc>];
+            }
+            product = codeSubset * codeSubset;
+            clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
+            count += 1;
+            println("Progress: <round(count*1.0/total3*100,0.1)>%"); 
         }
-        product = codeSubset * codeSubset;
-        // clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
-        count += 1;
-        println("Progress: <round(count*1.0/total3*100,0.1)>%"); 
-	}
-    println("Progress: 100% (Type 3 complete)\n"); 
+        println("Progress: 100% (Type 3 complete)\n"); 
+    }
     cloneMapDomain = range(cloneMap); 
     real total12 = size(cloneMapDomain) * 1.0; 
     println("Gathering Type 1 and 2 clones...");
@@ -89,10 +90,11 @@ public rel[snip, snip] type3ClonePairs = {};
 
     type2ClonePairs = {p | cpair p <- cleanPairs, areType2Clones(p.first,p.second)};
     println("Type 2#: <size(type2ClonePairs)>");
-
-    type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- removeBlocksIfEntireMethodPresent(clonePairs3)};
-    println("Type 3#: <size(type3ClonePairs)>/n");
-    println("Clone detection complete");
+    if(findType3){
+        type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- removeBlocksIfEntireMethodPresent(clonePairs3)};
+        println("Type 3#: <size(type3ClonePairs)>/n");
+        println("Clone detection complete");
+    }
 
 	return type1ClonePairs + type2ClonePairs + type3ClonePairs;	
 }
@@ -108,7 +110,7 @@ rel[value,value] cleanup(rel[value,value] r){
     return tmp;
 }
 
-test bool testClonePairs() = size(getClonePairs(|project://testClones|)) > 1;
+test bool testClonePairs() = size(getClonePairs(|project://testClones|, true)) > 1;
 
 public cmaps createCloneMaps(asts){
     map[codeAst, snips] cloneMap = ();
