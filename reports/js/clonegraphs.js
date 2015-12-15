@@ -22,6 +22,18 @@ function stripProjectName(name) {
 }
   var barfill = d3.scale.category20();
 
+var colorbrewerscale = d3.scale.ordinal()
+.range(["rgb(255,255,178)", "rgb(254,204,92)", "rgb(253,141,60)", "rgb(240,59,32)", "rgb(189,0,38)"]);
+
+// range 
+/*
+ <svg width="15" height="75">
+  <rect fill="rgb(255,255,178)" width="15" height="15" y="0"></rect>
+  <rect fill="rgb(254,204,92)" width="15" height="15" y="15"></rect>
+  <rect fill="rgb(253,141,60)" width="15" height="15" y="30"></rect><
+  rect fill="rgb(240,59,32)" width="15" height="15" y="45"></rect>
+  <rect fill="rgb(189,0,38)" width="15" height="15" y="60"></rect></svg>
+*/
   //var data = projects[project];
 	//console.log(project);
 	//console.log(data);	// returned object in screenshot
@@ -72,6 +84,15 @@ var formatPercent = d3.format(".0%");
 var x = d3.scale.category20()
     .rangeRoundBands([0, width], .1);
 
+
+var colorbrewerscale = d3.scale.ordinal()
+    .domain(x.domain())
+    .range(colorbrewer.RdBu[9]);
+
+/*
+var colorbrewerscale = d3.scale.ordinal()
+.range(["rgb(255,255,178)", "rgb(254,204,92)", "rgb(253,141,60)", "rgb(240,59,32)", "rgb(189,0,38)"]);
+*/
 var y = d3.scale.linear()
     .range([height, 0]);
 
@@ -454,7 +475,7 @@ state.selectAll("rect")
     .attr("y", function (d) { return y(d.value); })
     .attr("height", function (d) { return height - y(d.value); })
     .style("fill", function (d) { return color(d.name); })
-    .on('click', function(d) { console.log(d);});
+    .on('click', function(d) { console.log(d);  });
 
 
 var legend = groupsvg.selectAll(".legend")
