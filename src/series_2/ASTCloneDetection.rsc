@@ -31,8 +31,13 @@ public rel[snip, snip] type3ClonePairs = {};
 
  public rel[snip, snip] getClonePairs(loc project) {
 
+    println("Starting...\n");
+
 	set[node] asts = createAstsFromEclipseProject(project, false);
 	real similarityThreshold = SIMILARITY_THRESHOLD;
+
+    println("Collecting clone maps...\n");
+
 	maps = createCloneMaps(asts);
     
 	map[codeAst, snips] cloneMap = maps.c;
@@ -43,7 +48,9 @@ public rel[snip, snip] type3ClonePairs = {};
     rel[codeAst, codeAst] clonePairs3 = {};	
     
     attributes = domain(metricMap);
-
+    real total3 = size(attributes) * 1.0;
+    println("Gathering Type 3 clones...");
+    int count = 0;
 	for(att n <- attributes){
 	    int begin = n.sloc-MAX_SLOC_VARIATION;
 	    int end = n.sloc+MAX_SLOC_VARIATION;
@@ -54,30 +61,42 @@ public rel[snip, snip] type3ClonePairs = {};
             codeSubset += metricMap[<i,n.cc>];
         }
         product = codeSubset * codeSubset;
-
         clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
+        count += 1;
+        println("Progress: <round(count*1.0/total3*100,0.1)>%"); 
 	}
-
-	for(bucket <- range(cloneMap), size(bucket) > 1){
+    println("Progress: 100% (Type 3 complete)\n"); 
+    cloneMapDomain = range(cloneMap); 
+    real total12 = size(cloneMapDomain) * 1.0; 
+    println("Gathering Type 1 and 2 clones...");
+    count = 0;
+	for(bucket <- cloneMapDomain, size(bucket) > 1){
 		//for(cpair pair <- sort(bucket * bucket) , pair.first != pair.second, calcSimularity(pair.first.code, pair.second.code) >= similarityThreshold){
 		for(cpair pair <- sort(bucket * bucket), pair.first != pair.second){
 			clonePairs = removeExistingSubtrees(pair.first.code,clonePairs);
 			clonePairs = removeExistingSubtrees(pair.second.code,clonePairs);
 			clonePairs += pair;
 		}
+		count += 1;
+        println("Progress: <round(count*1.0/total12*100,0.1)>%"); 
 	}
+    println("Progress: 100% (Type 1 + 2)\n"); 
 
-    cleanPairs = cleanup(clonePairs);
+    cleanPairs = removeBlocksIfEntireMethodPresent(clonePairs);
     type1ClonePairs = {p | cpair p <- cleanPairs, p.first.code == p.second.code}; 
+    println("Type 1#: <size(type1ClonePairs)>");
     type2ClonePairs = {p | cpair p <- cleanPairs, areType2Clones(p.first,p.second)};
+    println("Type 2#: <size(type2ClonePairs)>");
     type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- cleanup(clonePairs3)};
-
+    println("Type 3#: <size(type3ClonePairs)>");
+    println("Clone detection complete");
 	return type1ClonePairs + type2ClonePairs + type3ClonePairs;	
 }
 
-rel[&T,&U] cleanup(rel[&T,&U] r){
 
-    tmp = {};
+rel[value,value] cleanup(rel[value,value] r){
+
+    rel[value, value] tmp = {};
 
     for(<f,s> <- r, <s,f> notin tmp, s != f)
      tmp += <f,s>;
@@ -168,7 +187,18 @@ test bool getSrcLocationTest2(){
 	Declaration ast = \vararg(lang::java::jdt::m3::AST::long(), "");
 	return getSrcLocations(ast) == getUnknownLoc();
 }
+rel[snip,snip] removeBlocksIfEntireMethodPresent(rel[snip,snip] clonePairs){
+    set[snip] allSnips =  carrier(clonePairs);
+    blocks = {b.code| snip b <- allSnips, \block := b.code};
 
+    for(snip m <- allSnips, \method(_,_,_,_,b) := m.code, b in blocks) {
+        iprintln(size(clonePairs));
+        clonePairs = {<l,r> | < snip l, snip r> <- clonePairs, \block := l.code || \block  := r.code, l.code != b, r.code != b};
+        iprintln(size(clonePairs));
+    }
+
+    return clonePairs;
+}
 rel[snip,snip] removeExistingSubtrees(ast, rel[snip,snip] clonePairs){
     visit(ast) {
         case node subtree:{

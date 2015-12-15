@@ -28,11 +28,11 @@ node rewriteAST ( node ast) {
 		case \class(name, extends, implements, body) => \class(uniformstr, extends, implements, body)
 
 		// methods
-		//case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions, impl)
-		//case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions)
+		case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions, impl)
+		case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), uniformstr, parameters, exceptions)
 
-		case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), name, parameters, exceptions, impl)
-		case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), name, parameters, exceptions)
+		//case \method(returntype, name, parameters, exceptions, impl) => \method (lang::java::jdt::m3::AST::short(), name, parameters, exceptions, impl)
+		//case \method(returntype, name, parameters, exceptions) => \method(lang::java::jdt::m3::AST::short(), name, parameters, exceptions)
     	//variables
 		case \variable(name, extraDimensions) => \variable(uniformstr, extraDimensions)
     	case \variable(name,  extraDimensions, init) => variable(uniformstr, extraDimensions, init)

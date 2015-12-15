@@ -13,7 +13,7 @@ void main(loc project){
 	datetime beginTime = now();
 
 	clonePairs = getClonePairs(project); 
-	cloneClasses = getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- clonePairs));
+	cloneClasses = getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- type1ClonePairs + type2ClonePairs));
 	println("\nTotal clone pairs found: <size(clonePairs)>");	
 	println("Total clone classes found: <size(cloneClasses)>\n");	
 	Duration execution = createDuration(beginTime, now());
