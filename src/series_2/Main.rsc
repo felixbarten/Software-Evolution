@@ -30,11 +30,14 @@ void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 	printBarGraph2(clonePairs, report, project);
 	printChordDiagram(clonePairs, report, project);
 	printForceGraph(clonePairs, report, project);
-	printCodeClones(clonePairs, report, project);
 	printProjectExecutionTime(execution, report); 	
 	
 	printClassesBarGraph(cloneClasses, report, project);
 	printClassesLOCBarGraph(cloneClasses, report, project);
+
+	printClonePairs(clonePairs, report, project);
+	printCloneClasses(cloneClasses, report, project);
+
 	
 	endReport(report);
 

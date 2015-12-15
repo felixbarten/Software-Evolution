@@ -1,1 +1,0 @@
-var divelem = d3.select("#source");

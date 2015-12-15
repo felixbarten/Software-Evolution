@@ -249,6 +249,7 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
 		str authority = project.authority;
+		authority += "/src/";
 		
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);
@@ -339,7 +340,7 @@ public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc pr
 	// end json file
 }
 
-public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
+public void printClonePairs(rel[snip, snip] clonepairs, loc file, loc project) {
 	loc JSON = |project://Software-Evolution/reports/json/codeclones.json|;
 	writeFile(JSON, "");
 	rel [str, tuple[list[str],list[str]]] codeclones = {};
@@ -349,6 +350,7 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
 		str authority = project.authority;
+		authority += "/src/";
 			
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);
@@ -406,10 +408,49 @@ public void printCodeClones(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, values);
 	appendToFile(JSON, "\n");
 	appendToFile(JSON, "]\n");
-	
-	
 }
 
+public void printCloneClasses(set[set[loc]] cloneclasses, loc file, loc project) {
+	loc JSON = |project://Software-Evolution/reports/json/cloneclasses.json|;
+	writeFile(JSON, "");
+	rel [str, tuple[list[str],list[str]]] codeclones = {};
+	values = "";
+	appendToFile(JSON, "[\n");	
+
+	// sort data 
+	int id = 1; 
+	for (set[loc] class <- cloneclasses){
+			values += "\t{\n";
+			values += "\t\t\"key\": <id>,\n";
+			values += "\t\t\"clones\": [\n";
+			int locsize = 0;
+			for (loc codelocation <- class) {
+				values += "\t\t\t{\n";
+				values += "\t\t\t\t\"location\": \"<codelocation>\",\n";
+				values += "\t\t\t\t\"source\":[\n";
+				for (str line <- readSrc(codelocation)) {
+					escaped = escape(line, ("\"": "\\\"","\t": "   "));
+					values += "\t\t\t\t\"<escaped>\",\n";
+				}
+				values = values[..-2];
+				
+				values += "\t\t\t\t]\n";
+				values += "\t\t\t},\n";
+				
+			}			
+			values = values[..-2];
+			values += "\t\t],\n";
+			values += "\t\t\"value\": <locsize>\n";
+			id += 1;
+			values += "\t},\n";
+		
+	}
+		// delete trailing ,
+		values = values[..-2];
+	appendToFile(JSON, values);
+	appendToFile(JSON, "\n");
+	appendToFile(JSON, "]\n");	
+}
 public void startJSON(loc file) {
 	writeFile(file, "");
 	appendToFile(file, "bardata = [\n");
