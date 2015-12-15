@@ -311,6 +311,10 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 	values = "";
 	int id = 1;
 
+	appendToFile(JSON, "[\n ");
+	
+	values = "";
+	// sort data 
 	for (tuple[snip first, snip second] pair <- clonepairs){
 		values += "\t{\n";
 		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
@@ -340,8 +344,7 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 		}
 		values = values[..-2];
 
-		values += "\t\t\t]\n";
-		values += "\t\t]\n";
+		values += "\n\t\t\t]\n";
 		// end of source array
 		values += "\t\t],\n";
 		// remove huge leaders to locations 
@@ -349,6 +352,7 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 		str clone2 = pair.second.location.path;
 		str authority = project.authority;
 		authority += "/src/";
+		
 		index1 = findLast(clone1, authority);
 		index2 = findLast(clone2, authority);
 
@@ -359,7 +363,9 @@ public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc projec
 			clone2 = substring(clone2, (index2 + size(authority))); 
 		}		
 		values += "\t\t\"clone1\": \"<clone1>\",\n";
-		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t\t\"clone2\": \"<clone2>\",\n";
+		values += "\t\t\"clone1fullloc\": \"<pair.first.location>\",\n";
+		values += "\t\t\"clone2fullloc\": \"<pair.second.location>\"\n";
 		values += "\t},\n";
 	}
 	// delete trailing ,
