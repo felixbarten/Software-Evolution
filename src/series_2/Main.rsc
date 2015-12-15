@@ -9,11 +9,11 @@ import series_2::misc::util;
 import series_2::misc::datatypes;
 import util::Webserver;
 
-void main(loc project){
+void main(loc project, bool useType3){
 	datetime beginTime = now();
 
-	clonePairs = getClonePairs(project); 
-	cloneClasses = getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- type1ClonePairs + type2ClonePairs+ type3ClonePairs));
+	clonePairs = getClonePairs(project,useType3); 
+	cloneClasses = getCloneClasses(({}| it+<l.location,r.location> | < snip l, snip r> <- type1ClonePairs + type2ClonePairs));
 	println("\nTotal clone pairs found: <size(clonePairs)>");	
 	println("Total clone classes found: <size(cloneClasses)>\n");	
 	Duration execution = createDuration(beginTime, now());
