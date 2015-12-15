@@ -131,8 +131,15 @@ d3.json("json/bargraph.json", function(error, data) {
       .attr("fill", function(d) { return barfill(d.value); })
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
+      .on('click', onClickBar())
 
 });
+
+function onClickBar() {
+  return function(d) {
+    console.log(d);
+  }
+}
 
 function type(d) {
   d.value = +d.value;
@@ -209,6 +216,8 @@ d3.json("json/cloneclassbargraph.json", function(error, data) {
       .attr("fill", function(d) { return barfill(d.value); })
       .on('mouseover', classtip.show)
       .on('mouseout', classtip.hide)
+      .on('click', function(d) {     console.log(d);
+    window.location = "cloneclasses.html?key=" + d.key; })
  
 });
 
@@ -281,9 +290,17 @@ d3.json("json/cloneclasslocbargraph.json", function(error, data) {
       .attr("fill", function(d) { return barfill(d.value); })
       .on('mouseover', classloctip.show)
       .on('mouseout', classloctip.hide)
+      .on('click', onClickBarGraphClassLoc())
    
 });
 
+function onClickBarGraphClassLoc() {
+  return function(d) {
+    console.log(d);
+    window.location = "cloneclasses.html?key=" + d.key;
+
+  }
+}
 
 
 // Chord graph 
@@ -396,7 +413,7 @@ function fade(opacity) {
 function drillDown() {
   return function(d,i) {
     console.log(names[i]);
-    window.location = "clonesource.html?clone=" + names[i];
+    window.location = "clonepairs.html?clone=" + names[i];
   }
 }
 
