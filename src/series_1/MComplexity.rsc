@@ -28,6 +28,7 @@ public int calcMethodCC(methodAST){
 	return i;
 } 
 
+public int calcSubtreeCC(ast) = calcMethodCC(ast); 
 
 public list[tuple[loc,int,int]] calcProjectCC(M3 input){
 	model = input;

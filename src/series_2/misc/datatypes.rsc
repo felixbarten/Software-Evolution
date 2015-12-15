@@ -3,7 +3,7 @@ module series_2::misc::datatypes
 data ClonePair = ClonePair(snip l, snip r);
 
 // Confusing sometimes but otherwise handy
-alias codeAst = value;
+alias codeAst = node;
 //code snippet
 alias snip = tuple[loc location, codeAst code];
 alias snips = rel[loc location, codeAst code];
