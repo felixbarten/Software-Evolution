@@ -9,7 +9,6 @@ import lang::java::jdt::m3::AST;
 import lang::java::m3::AST;
 import lang::java::m3::Core;
 
-
 import series_2::Similarity;
 import series_2::misc::util;
 import series_2::misc::datatypes;
@@ -18,45 +17,91 @@ import series_2::Printing;
 import series_2::Subtrees;
 
 import series_1::LOC;
+import series_1::MComplexity;
 
-int WEIGHT_THRESHOLD = 1;
+//int WEIGHT_THRESHOLD = 1; //Doubt we will ever need this
+
 real SIMILARITY_THRESHOLD = 0.7;
+int SLOC_THRESHOLD = 6;
+int MAX_SLOC_VARIATION = 2;
+
+public rel[snip, snip] type1ClonePairs = {};
+public rel[snip, snip] type2ClonePairs = {};
+public rel[snip, snip] type3ClonePairs = {};
 
  public rel[snip, snip] getClonePairs(loc project) {
 
 	set[node] asts = createAstsFromEclipseProject(project, false);
 	real similarityThreshold = SIMILARITY_THRESHOLD;
+	maps = createCloneMaps(asts);
+    
+	map[codeAst, snips] cloneMap = maps.c;
+    map[att, set[codeAst]] metricMap = maps.m;
 
-	map[value, snips] cloneMap = createCloneMap(asts);
 	rel[snip, snip] clonePairs = {};
 
+    rel[codeAst, codeAst] clonePairs3 = {};	
+    
+    attributes = domain(metricMap);
+
+	for(att n <- attributes){
+	    int begin = n.sloc-MAX_SLOC_VARIATION;
+	    int end = n.sloc+MAX_SLOC_VARIATION;
+        candidateRange = [begin..end];	
+
+        codeSubset = {};
+        for(i <- candidateRange, metricMap[<i,n.cc>]?){
+            codeSubset += metricMap[<i,n.cc>];
+        }
+        product = codeSubset * codeSubset;
+
+        clonePairs3 += {<l,r>| <l,r> <- product, size(product) > 1 && l != r && areType3Clones(l,r, SIMILARITY_THRESHOLD)};
+	}
+
 	for(bucket <- range(cloneMap), size(bucket) > 1){
-		for(tuple[snip first, snip second] pair <- sort(bucket * bucket) , pair.first != pair.second, calcSimularity(pair.first.code, pair.second.code) >= similarityThreshold){
+		//for(cpair pair <- sort(bucket * bucket) , pair.first != pair.second, calcSimularity(pair.first.code, pair.second.code) >= similarityThreshold){
+		for(cpair pair <- sort(bucket * bucket), pair.first != pair.second){
 			clonePairs = removeExistingSubtrees(pair.first.code,clonePairs);
 			clonePairs = removeExistingSubtrees(pair.second.code,clonePairs);
 			clonePairs += pair;
 		}
 	}
-	return clonePairs;	
+
+    cleanPairs = cleanup(clonePairs);
+    type1ClonePairs = {p | cpair p <- cleanPairs, p.first.code == p.second.code}; 
+    type2ClonePairs = {p | cpair p <- cleanPairs, areType2Clones(p.first,p.second)};
+    type3ClonePairs = {<<l@src, l>, <r@src, r>>  | <l,r> <- cleanup(clonePairs3)};
+
+	return type1ClonePairs + type2ClonePairs + type3ClonePairs;	
+}
+
+rel[&T,&U] cleanup(rel[&T,&U] r){
+
+    tmp = {};
+
+    for(<f,s> <- r, <s,f> notin tmp, s != f)
+     tmp += <f,s>;
+    
+    return tmp;
 }
 
 test bool testClonePairs() = size(getClonePairs(|project://testClones|)) > 1;
 
-public map[value, snips] createCloneMap(asts){
-    map[value, snips] cloneMap = ();
-	int subtreeWeightThreshold = WEIGHT_THRESHOLD;	
+public cmaps createCloneMaps(asts){
+    map[codeAst, snips] cloneMap = ();
+    map[att, set[codeAst]] metricMap = ();
 
 	visit(asts) {
 		case node a:{
-			if(calcSubtreeSize(a) >= subtreeWeightThreshold){
-				cloneMap = addSubtreeToMap(a,cloneMap, generalizeAST, getSrcLocations);
-			}
+            result = addSubtreeToMaps(a, cloneMap, metricMap, generalizeAST, getSrcLocations);
+            cloneMap = result[0];
+            metricMap = result[1];
 		}
 	 }
 
-    return cloneMap;
+    return <cloneMap,metricMap>;
 }
-
+//TODO this may be wrong
 public set[set[loc]] getCloneClasses(rel[loc, loc] pairs){
 
     temp = pairs+;
@@ -70,7 +115,7 @@ public node generalizeAST(ast){
     return rewriteAST(ast);
 }   
 
-map[value, snips] addSubtreeToMap(subtree, map[value, rel[loc, value]] m, astTransformFunction, retrieveLocation){
+cmaps addSubtreeToMaps(subtree, map[codeAst, snips] clones,map[att, set[codeAst]] metrics, astTransformFunction, retrieveLocation){
     loc source = retrieveLocation(subtree);
     int SLOCs = 0; 
 
@@ -78,15 +123,24 @@ map[value, snips] addSubtreeToMap(subtree, map[value, rel[loc, value]] m, astTra
         SLOCs = getLOCAstSubTree(source);
     } 
 
-    if(SLOCs >= 6){ //ignore all subtrees that aren't spread over multiple lines
+    if( (source.end.line - source.begin.line > 6) && SLOCs >= SLOC_THRESHOLD){ //ignore all subtrees that aren't spread over multiple lines
         rewrittenTree = astTransformFunction(subtree);
-        if(m[rewrittenTree]?){
-            m[rewrittenTree] += <source, subtree>;
+ //       if(calcSubtreeSize(subtree) > 30){ 
+        if(true){ 
+            cc = calcMethodCC(subtree);
+            if(metrics[<SLOCs,cc>]?){
+                metrics[<SLOCs,cc>] += subtree;
+            } else {
+                metrics[<SLOCs,cc>] = {subtree};
+            }
+        }
+        if(clones[rewrittenTree]?){
+            clones[rewrittenTree] += <source, subtree>;
         } else {
-            m[rewrittenTree] = {<source, subtree>};
+            clones[rewrittenTree] = {<source, subtree>};
         }
     }
-    return m;
+    return <clones,metrics>;
 }
 
 loc getSrcLocations(node subtree){
@@ -97,7 +151,7 @@ loc getSrcLocations(node subtree){
             case Statement a: source = a@src;
             case Expression a: source = a@src;
             case Modifier a: source = a@src;
-            case node _: source = getUnknownLoc();
+            default : source = getUnknownLoc();
         }
     } catch: source = getUnknownLoc(); //The element had no src annotation
     return source;

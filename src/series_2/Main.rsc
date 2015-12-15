@@ -7,6 +7,7 @@ import series_2::Printing;
 import series_2::ASTCloneDetection;
 import series_2::misc::util;
 import series_2::misc::datatypes;
+import util::Webserver;
 
 void main(loc project){
 	datetime beginTime = now();
@@ -18,7 +19,6 @@ void main(loc project){
 	Duration execution = createDuration(beginTime, now());
 	
 	writeOutputToFile(clonePairs, cloneClasses, execution,project);
-
 }
 
 void writeOutputToFile(clonePairs, cloneClasses, execution, project){
@@ -37,4 +37,5 @@ void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 	printClassesLOCBarGraph(cloneClasses, report, project);
 	
 	endReport(report);
+
 }

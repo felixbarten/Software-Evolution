@@ -7,7 +7,10 @@ import series_2::misc::util;
 import series_2::misc::datatypes;
 import series_2::Subtrees;
 
-// Similarity = 2xS/(2xS+L+R)
+@doc{
+    Calculates the similarity of two subtrees
+    Similarity = 2xS/(2xS+L+R)
+ }
 real calcSimularity(value l, value r){
 	set[value] left = treeToSet(l);
 	set[value] right = treeToSet(r);
@@ -33,16 +36,14 @@ test bool calcSimilarityTest3(){
 	return calcSimularity(a,b) == 0.5;	
 }
 
+//Check for exact clones
+bool areType1Clones(snip a, snip b) = a.code == b.code; 
 
-bool areType2Clones(snip a, snip b){
-    return a.code != b.code;
-}
+//DOES NOT NORMALIZE
+bool areType2Clones(snip a, snip b) = !areType1Clones(a,b);
 
-bool areType3Clones(a, b){
-    aSize = size(a);
-    bSize = size(b); 
-    if(!(aSize - bSize < 3 || bSize - aSize < 3)){
-       return false;
-    }
-    return calcSimularity(a,b) > similarityThreshold; 
+//Uses similarity between to determine if type 3
+bool areType3Clones(a, b, similarityThreshold){
+    simularity = calcSimularity(a,b); 
+    return simularity >= similarityThreshold && simularity <= 1.0; 
 }  
