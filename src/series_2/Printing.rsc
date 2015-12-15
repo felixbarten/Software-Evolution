@@ -177,57 +177,8 @@ public void printForceGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 	appendToFile(JSON, "]");
 }
 
-public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 
-	// PRINT JSON DATA FILE
-	loc JSON = |project://Software-Evolution/reports/json/bargraph.js|;
-	startJSON(JSON);
-	// insert key and values
-	appendToFile(JSON, "\t\"key\": \"Code clones size\",\n");
-	
-	appendToFile(JSON, "\t\"values\": [\n ");
-	
-	values = "";
-	// sort data 
-	for (tuple[snip first, snip second] pair <- clonepairs){
-		values += "\t{\n";
-		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
-		lines =  pair.first.location.end.line - pair.first.location.begin.line;
-		values += "\t\t\"value\": <lines>,\n";
-		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
-		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
-		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
-		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
-		// remove huge leaders to locations 
-		str clone1 = pair.first.location.path;
-		str clone2 = pair.second.location.path;
-		str authority = project.authority;
-		
-		index1 = findLast(clone1, authority);
-		index2 = findLast(clone2, authority);
-
-		if (index1 != -1){
-			clone1 = substring(clone1, (index1 + size(authority))); 
-		}
-		if (index1 != -1){
-			clone2 = substring(clone2, (index2 + size(authority))); 
-		}		
-		values += "\t\t\"clone1\": \"<clone1>\",\n";
-		values += "\t\t\"clone2\": \"<clone2>\"\n";
-		values += "\t},\n";
-	}
-	// delete trailing ,
-	values = values[..-1];
-	
-	// write values 
-	appendToFile(JSON, values);
-	appendToFile(JSON, "]");
-	// end json file
-	endJSON(JSON);
-}
-
-
-public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
+public void printClonePairBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
 
 	// PRINT JSON DATA FILE
 	loc JSON = |project://Software-Evolution/reports/json/bargraph.json|;
@@ -245,6 +196,8 @@ public void printBarGraph2(rel[snip, snip] clonepairs, loc file, loc project) {
 		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
 		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
 		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"clonepairid\": <id>,\n";
+		id += 1;
 		// remove huge leaders to locations 
 		str clone1 = pair.first.location.path;
 		str clone2 = pair.second.location.path;
@@ -330,6 +283,74 @@ public void printClassesLOCBarGraph(set[set[loc]] cloneclasses, loc file, loc pr
 			
 			values += "\t},\n";
 			id += 1;
+	}
+	// delete trailing ,
+	values = values[..-2];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+}
+
+public void printClonePairsSrc(rel[snip, snip] clonepairs , loc file, loc project) { 
+	loc JSON = |project://Software-Evolution/reports/json/clonepairs2.json|;
+	writeFile(JSON, "");
+	rel [str, tuple[list[str],list[str]]] codeclones = {};
+	values = "";
+	id = 0;
+
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		values += "\t{\n";
+		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <lines>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		values += "\t\t\"clonepairid\": <id>,\n";
+		id += 1;
+		values += "\t\t\"source\": [\n";
+		values += "\t\t\t[\n";
+		
+		for (str line <- readSrc(clone1)) {
+			escaped = escape(line, ("\"": "\\\"","\t": "   "));
+			values += "\t\t\t\t\"<escaped>\",\n";
+		}
+		values = values[..-2];
+
+		values += "\t\t\t],\n";
+		values += "\t\t\t[\n";
+
+		for (str line <- readSrc(clone2)) {
+			escaped = escape(line, ("\"": "\\\"","\t": "   "));
+			values += "\t\t\t\t\"<escaped>\",\n";
+		}
+		values = values[..-2];
+
+		values += "\t\t\t]\n";
+		values += "\t\t]\n";
+		// end of source array
+		values += "\t\t],\n";
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		authority += "/src/";
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
 	}
 	// delete trailing ,
 	values = values[..-2];
@@ -461,4 +482,55 @@ public void startDataSet(loc file) {
 }
 public void endJSON(loc file) {
 	appendToFile(file, "}\n];");
+}
+
+
+/* Obsolete code, NVD3 graphs */
+public void printBarGraph(rel[snip, snip] clonepairs, loc file, loc project) {
+
+	// PRINT JSON DATA FILE
+	loc JSON = |project://Software-Evolution/reports/json/bargraph.js|;
+	startJSON(JSON);
+	// insert key and values
+	appendToFile(JSON, "\t\"key\": \"Code clones size\",\n");
+	
+	appendToFile(JSON, "\t\"values\": [\n ");
+	
+	values = "";
+	// sort data 
+	for (tuple[snip first, snip second] pair <- clonepairs){
+		values += "\t{\n";
+		values += "\t\t\"label\": \"<pair.first.location.path><pair.first.location.begin.line><pair.first.location.end.line> + <pair.second.location.path><pair.second.location.begin.line><pair.second.location.end.line>\",\n";
+		lines =  pair.first.location.end.line - pair.first.location.begin.line;
+		values += "\t\t\"value\": <lines>,\n";
+		values += "\t\t\"begin1\": <pair.first.location.begin.line>,\n";
+		values += "\t\t\"end1\": <pair.first.location.end.line>,\n";
+		values += "\t\t\"begin2\": <pair.second.location.begin.line>,\n";
+		values += "\t\t\"end2\": <pair.second.location.end.line>,\n";
+		// remove huge leaders to locations 
+		str clone1 = pair.first.location.path;
+		str clone2 = pair.second.location.path;
+		str authority = project.authority;
+		
+		index1 = findLast(clone1, authority);
+		index2 = findLast(clone2, authority);
+
+		if (index1 != -1){
+			clone1 = substring(clone1, (index1 + size(authority))); 
+		}
+		if (index1 != -1){
+			clone2 = substring(clone2, (index2 + size(authority))); 
+		}		
+		values += "\t\t\"clone1\": \"<clone1>\",\n";
+		values += "\t\t\"clone2\": \"<clone2>\"\n";
+		values += "\t},\n";
+	}
+	// delete trailing ,
+	values = values[..-1];
+	
+	// write values 
+	appendToFile(JSON, values);
+	appendToFile(JSON, "]");
+	// end json file
+	endJSON(JSON);
 }

@@ -27,7 +27,7 @@ void writeOutputToFile(clonePairs, cloneClasses, execution, project){
 
 	printSnipsToFile(clonePairs, report);
 	printBarGraph(clonePairs, report, project);
-	printBarGraph2(clonePairs, report, project);
+	printClonePairBarGraph(clonePairs, report, project);
 	printChordDiagram(clonePairs, report, project);
 	printForceGraph(clonePairs, report, project);
 	printProjectExecutionTime(execution, report); 	
