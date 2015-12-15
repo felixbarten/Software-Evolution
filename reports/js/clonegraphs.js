@@ -140,7 +140,7 @@ function onClickBar() {
     console.log(d);
     //  TODO ADD SOME WAY OF IDENTIFYING THE VARIOUS CLONE PAIRS WITH A SHARED IDENTFIER? MAYBE JUST ITERATE OVER THEM THE SAME WAY AND get same ID. 
 
-    // window.location = "clonepairs?clonepairid=d.clonepairid";
+    window.location = "clonepairs?clonepairid=" + d.clonepairid;
   }
 }
 
